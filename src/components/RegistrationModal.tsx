@@ -333,7 +333,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
                       <input
                         type="text"
                         required
-                        placeholder="e.g. Adhyumna Chowdary Devineni"
+                        placeholder="e.g. Adhyumna Chowdary"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         className="w-full bg-white/[0.04] border border-white/10 rounded-xl p-2.5 text-white focus:outline-none focus:border-neon-purple focus:ring-1 focus:ring-neon-purple/50 transition-all"
