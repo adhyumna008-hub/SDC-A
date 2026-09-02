@@ -1,0 +1,289 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+
+.glow-shadow-primary {
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+}
+.glow-shadow-primary:hover {
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+}
+
+.glow-shadow-cyan {
+  box-shadow: 0 0 10px rgba(14, 165, 233, 0.4);
+}
+.glow-shadow-cyan:hover {
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.8);
+}
+
+.glow-hover:hover {
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+}
+
+.bg-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.text-outline {
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.45);
+  color: transparent;
+  transition: all 0.3s ease;
+}
+
+.text-outline:hover {
+  -webkit-text-stroke: 0px;
+  color: #ffffff;
+}
+
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #a855f7;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* Hide scrollbar for clean horizontal scrolling */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Custom scrollbar for terminal elements */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0b1326;
+}
+::-webkit-scrollbar-thumb {
+  background: #2d3449;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a855f7;
+}
+
+@keyframes cyber-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes cyber-float-reverse {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+}
+
+@keyframes cyber-pulse-slow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.65;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.95;
+  }
+}
+
+.animate-cyber-float {
+  animation: cyber-float 5s ease-in-out infinite;
+}
+
+.animate-cyber-float-reverse {
+  animation: cyber-float-reverse 6s ease-in-out infinite;
+}
+
+.animate-cyber-pulse {
+  animation: cyber-pulse-slow 4s ease-in-out infinite;
+}
+
+/* Watermark Ambient Animations */
+@keyframes watermark-spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes watermark-spin-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes watermark-float-drift {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-18px) translateX(8px) rotate(2deg);
+  }
+  66% {
+    transform: translateY(12px) translateX(-6px) rotate(-1.5deg);
+  }
+}
+
+@keyframes watermark-breathe {
+  0%, 100% {
+    opacity: 0.04;
+  }
+  50% {
+    opacity: 0.075;
+  }
+}
+
+.animate-watermark-spin {
+  animation: watermark-spin-slow 100s linear infinite;
+}
+
+.animate-watermark-spin-reverse {
+  animation: watermark-spin-reverse 120s linear infinite;
+}
+
+.animate-watermark-drift {
+  animation: watermark-float-drift 16s ease-in-out infinite;
+}
+
+.animate-watermark-drift-slow {
+  animation: watermark-float-drift 22s ease-in-out infinite reverse;
+}
+
+.animate-watermark-breathe {
+  animation: watermark-breathe 8s ease-in-out infinite;
+}
+
+/* ==========================================================================
+   GLASSMORPHISM & SOFT UI (NEUMORPHISM) & AURORA TOKENS
+   Inspired by GCore (Pin 1) & Vetra (Pin 2)
+   ========================================================================== */
+
+/* Glass Surfaces */
+.glass-surface {
+  background: rgba(16, 19, 32, 0.65);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-surface-elevated {
+  background: rgba(20, 24, 40, 0.8);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 24px 60px -10px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.glass-capsule {
+  background: rgba(14, 17, 28, 0.75);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+}
+
+/* Neumorphism (Soft UI) Tactile Panels */
+.soft-ui-panel {
+  background: linear-gradient(135deg, rgba(24, 28, 46, 0.85) 0%, rgba(13, 16, 28, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.soft-ui-card {
+  background: linear-gradient(155deg, rgba(22, 26, 44, 0.75) 0%, rgba(12, 15, 26, 0.88) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 28px -8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.soft-ui-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(168, 85, 247, 0.35);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), 0 0 24px -4px rgba(168, 85, 247, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.soft-ui-btn {
+  background: linear-gradient(180deg, rgba(36, 41, 66, 0.8) 0%, rgba(18, 21, 36, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.soft-ui-btn:hover {
+  background: linear-gradient(180deg, rgba(46, 52, 82, 0.85) 0%, rgba(24, 28, 48, 0.95) 100%);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.soft-ui-btn:active {
+  transform: scale(0.98);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+.soft-ui-chip {
+  background: rgba(20, 24, 40, 0.7);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.soft-ui-inset {
+  background: rgba(6, 8, 15, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.75), inset 0 1px 2px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Aurora & Celestial Horizon Utilities */
+.aurora-beam {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.38) 0%, rgba(168, 85, 247, 0.28) 45%, rgba(14, 165, 233, 0.15) 75%, transparent 100%);
+  filter: blur(65px);
+  pointer-events: none;
+}
+
+.horizon-glow {
+  background: radial-gradient(ellipse 65% 55% at 50% 100%, rgba(249, 115, 22, 0.22) 0%, rgba(168, 85, 247, 0.18) 35%, rgba(14, 165, 233, 0.08) 60%, transparent 80%);
+}
+
+/* Circuit trace dash animation */
+@keyframes pulse-trace {
+  0% { stroke-dashoffset: 40; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.circuit-pulse {
+  stroke-dasharray: 6, 8;
+  animation: pulse-trace 2.5s linear infinite;
+}
+

@@ -1,0 +1,348 @@
+================================================================================
+STUDENT DEVELOPERS CLUB (SDC) PLATFORM
+COMPLETE SYSTEM INFRASTRUCTURE, FUNCTIONAL BLUEPRINT & AI UI GENERATOR PROMPT
+(Theme & Color Neutral Specification)
+================================================================================
+
+--------------------------------------------------------------------------------
+PART 1: MASTER PROMPT FOR UI/UX GENERATOR AI
+--------------------------------------------------------------------------------
+Copy and paste the prompt below into any UI generator AI (v0.dev, Lovable.dev, 
+Claude, Bolt.new, Galileo AI, Figma AI, etc.):
+
+"""
+Build a complete, professional, high-performance web platform and command center
+for the "Student Developers Club (SDC)". You have full creative freedom to design
+the most fitting, modern, and visually compelling theme, color palette, typography,
+and layout for a premier university developer ecosystem.
+
+Ensure all the following functional systems, routes, and data flows are completely
+integrated:
+
+1. GLOBAL NAVIGATION & SHELL:
+   - Floating header with club logo/branding, page links, real-time activity beacon,
+     and authenticated user profile trigger with Google Sign-In / Email auth modal.
+   - Top emergency / urgent announcement ticker for breaking news and deadlines.
+   - Clean, non-intrusive animated background layer.
+   - Global footer with club socials, community channels, and university affiliations.
+
+2. PAGE 1: HOME / LANDING PAGE:
+   - Hero Section: High-impact headline, live platform status metric, and primary
+     call-to-action buttons ("Explore Events" and "Join Club").
+   - Next Up Spotlight Card: Dynamic card featuring the nearest upcoming workshop
+     or hackathon, showing real-time seats left counter and direct reservation.
+   - Curated Opportunities Radar: Highlights external tech internships, open-source
+     grants, and hackathons with direct external apply links.
+   - Flagship Hackathon Tracks & Prize Pool Matrix: Dedicated section highlighting
+     a ₹5,00,000+ Total Prize Pool across 3 specialized tracks:
+     * Track 1: AI / Machine Learning Track (₹2,00,000 Prize Pool)
+       Focus: Large Language Models, autonomous agent swarms, edge computer vision.
+     * Track 2: Cloud Infrastructure Track (₹1,50,000 Prize Pool)
+       Focus: Kubernetes, serverless microservices, distributed edge compute.
+     * Track 3: Cybersecurity Track (₹1,50,000 Prize Pool)
+       Focus: Zero-trust architecture, vulnerability audits, smart contract security.
+     Includes prize breakdowns (1st, 2nd, 3rd), problem statements, and registration CTA.
+   - Discord Community Join Banner: High-impact community block with "Connect with
+     500+ student developers" live metric and prominent "JOIN DISCORD SERVER" button.
+
+3. PAGE 2: EVENT TERMINAL (/events):
+   - Tabbed view switching between "Upcoming Events" and "Past Events".
+   - Category filter pills (All, Workshop, Hackathon, Speaker, Contest).
+   - Event Cards: Display cover image, date, venue, team size constraints (Solo vs Team),
+     seat capacity progress bar, and dynamic action button ("REGISTER" or "✓ REGISTERED").
+   - Event Registration Modal:
+     * Mode switcher: Solo registration vs Team registration.
+     * Team mode: Generate unique 6-character team code or join with an existing code.
+     * Required field: Phone / WhatsApp number for event communications.
+     * Institutional Origin: Choice between host college ("Vardhaman College of Engineering")
+       and "Other Institution" (which reveals a custom text box to type college name).
+   - Past Event Cards:
+     * Shows event date and verified attendance count.
+     * Winner Standings: Displays 1st, 2nd, and 3rd place with Team Name, Student Member
+       Names, and Project Titles.
+     * Photo Album Gallery: Displays a 4-photo thumbnail filmstrip with a "+X more" badge.
+     * Photo Album Lightbox Modal: Interactive carousel with next/previous controls,
+       keyboard arrow navigation, and a thumbnail tray.
+     * Verifiable Certificate Modal: Official digital certificate with QR verification code.
+
+4. PAGE 3: OPPORTUNITY RADAR (/opportunities):
+   - Curated feed of external engineering opportunities categorized by tags
+     (#Hackathons, #Internships, #OpenSource, #Remote).
+   - Card includes organization name, application deadline timer, and direct link.
+
+5. PAGE 4: IDEA HUB (/idea-hub):
+   - Democratic event proposal forum where student members pitch workshops or talks.
+   - Proposal submission form: Title, Category, and Description.
+   - Real-time upvoting engine with 1-vote-per-user protection.
+   - Clean moderation filter: Approved or rejected proposals are automatically removed
+     from the community feed so only active community discussions remain visible.
+
+6. PAGE 5: MY REGISTRATIONS & PASSES (/my-registrations):
+   - Personal student ticket wallet listing all events the user has registered for.
+   - Unique Cryptographic QR Code Pass (encoded with SDC_TICKET token).
+   - Live Attendance Verification Badge: Displays "PENDING CHECK-IN" or "✓ VERIFIED AT VENUE"
+     along with the exact check-in timestamp.
+   - Details listed on pass: Student Name, Roll Number, College, Phone, Team Code.
+
+7. PAGE 6: ADMIN COMMAND CENTER (/admin):
+   - Role-protected route accessible only to designated administrator email accounts.
+   - System Status & Metrics: Live cards showing active events, registered headcount, ideas.
+   - Real-Time Camera Attendance QR Scanner:
+     * Uses device camera to scan student ticket QR codes.
+     * Enforces single-scan check-in rules (prevents duplicate scans; alerts if already scanned).
+     * Provides instant audio chime feedback on verification.
+   - Attendee Roster Management: Searchable table of registered students with manual
+     1-click check-in toggle and status filters (All, Present, Absent, Host College, External).
+   - HOD Official Attendance Report Export (.txt):
+     * Generates a downloadable text file formatted for academic heads and professors.
+     * Segregated by Presentees vs Absentees.
+     * Subdivided by Host College students vs External College students.
+   - Dedicated "Recap Past Event with Photo Album" Modal:
+     * Form to publish past events: Title, Category, Date, Venue, Attendance, Description.
+     * Multi-photo album URLs input with 1-click sample presets.
+     * Winner standings input: Team Names and Student Member Names for 1st, 2nd, 3rd place.
+     * Directly publishes the recap to the past events ledger.
+   - Idea Hub Moderation Panel: Lists pending ideas with 1-click "Approve" (which pre-fills
+     the New Event creation form and purges the request) or "Reject".
+"""
+
+--------------------------------------------------------------------------------
+PART 2: SYSTEM ARCHITECTURE & TECH STACK
+--------------------------------------------------------------------------------
+
+Client Application Layer:
+- Framework: React 18 with TypeScript
+- Build Tool: Vite
+- Styling: Tailwind CSS (responsive from mobile 320px to 4K displays)
+- Iconography: Material Symbols Outlined / Lucide Icons
+- Barcode / QR Scanning: html5-qrcode
+- Animations: Pure CSS hardware-accelerated transforms and canvas
+
+Backend & Infrastructure (Google Cloud Firebase):
+- Firebase Authentication: Google OAuth popup + Email/Password authentication.
+- Cloud Firestore: Real-time NoSQL document database with onSnapshot listeners.
+- Firebase Hosting: Global CDN Edge deployment with single-page app rewrite rules.
+- Dual-Layer Cache: Combines Firestore snapshots with browser local storage for
+  instant, zero-latency state rendering.
+
+Role-Based Access Control (RBAC):
+- "admin": Whitelisted email accounts (adhyumna008@gmail.com, studentdevelopersclub88@gmail.com).
+  Full management access: scanner, reports, publishing, moderation, history.
+- "member": Users authenticating with the host college institutional domain (@vardhaman.org).
+  Access to internal events, idea hub submission, team registration, certificates.
+- "guest": External users (Gmail or other college domains).
+  Access to open radar, inter-college hackathons, external college input.
+
+--------------------------------------------------------------------------------
+PART 3: COMPONENT HIERARCHY & ROUTING MAP
+--------------------------------------------------------------------------------
+
+App Root (App.tsx)
+ ├── Background Canvas (MinimalCyberBackground.tsx)
+ ├── Top Urgency Ticker (AnnouncementTicker.tsx)
+ ├── Navigation Bar (Navbar.tsx)
+ ├── Page Routing:
+ │    ├── /                 -> LandingPage.tsx
+ │    ├── /events           -> EventsPage.tsx
+ │    ├── /opportunities    -> OpportunitiesPage.tsx
+ │    ├── /idea-hub         -> IdeaHubPage.tsx
+ │    ├── /my-registrations -> MyRegistrationsPage.tsx
+ │    └── /admin            -> AdminDashboard.tsx
+ ├── Modals & Overlays:
+ │    ├── AuthModal.tsx (Google & Email sign in/up)
+ │    ├── RegistrationModal.tsx (Solo/Team + College Selector)
+ │    ├── QRCheckinModal.tsx (Camera QR Scanner with Sound & Guard)
+ │    ├── PhotoAlbumModal.tsx (Lightbox Carousel for Event Photos)
+ │    └── CertificateModal.tsx (Verified Credential Viewer)
+ └── Global Footer (Footer.tsx)
+
+--------------------------------------------------------------------------------
+PART 4: DETAILED PAGE BLUEPRINTS & FUNCTIONALITY
+--------------------------------------------------------------------------------
+
+1. HOME / LANDING PAGE:
+   - Hero Section:
+     * Status indicator showing system health and registration status.
+     * Mission statement headline and description.
+     * Primary action buttons to explore events or join the club.
+   - Next Up Spotlight Card:
+     * Displays title, date, location, and remaining seats for the next workshop.
+     * Instant button to reserve seat.
+   - Curated External Opportunities:
+     * 3-card grid displaying external hackathons and grants with direct apply links.
+   - Flagship Hackathon Tracks & Prize Pool Matrix:
+     * Summary banner: ₹5,00,000+ Total Bounty (+ ₹10L Cloud Credits).
+     * 3 Track Cards:
+       1. AI & Machine Learning Track (₹2,00,000)
+          Focus: Large Language Models, agent swarms, edge computer vision.
+          Prizes: 1st (₹1,00,000), 2nd (₹60,000), 3rd (₹40,000).
+       2. Cloud Infrastructure Track (₹1,50,000)
+          Focus: Kubernetes, serverless microservices, distributed edge compute.
+          Prizes: 1st (₹75,000), 2nd (₹45,000), 3rd (₹30,000).
+       3. Cybersecurity Track (₹1,50,000)
+          Focus: Zero-trust architecture, vulnerability audits, smart contract security.
+          Prizes: 1st (₹75,000), 2nd (₹45,000), 3rd (₹30,000).
+   - Discord Community Join Banner:
+     * Community metric: "Connect with 500+ student developers".
+     * Channel highlights: #hackathons, #code-reviews, #internships.
+     * Direct CTA button linking to official Discord server.
+
+2. EVENT TERMINAL (/events):
+   - Tabs: "Upcoming Events" vs "Past Events".
+   - Category Filters: All, Workshop, Hackathon, Speaker, Contest.
+   - Registration Logic:
+     * Evaluates whether current user has registered for each event.
+     * Displays "REGISTER" or "✓ REGISTERED" (with link to view pass).
+   - Registration Modal:
+     * Solo vs Team selection.
+     * Team code creation or entry.
+     * Phone / WhatsApp number input.
+     * College selector: Vardhaman College vs Other (with custom college input).
+   - Past Events Ledger:
+     * Verified attendance counts.
+     * Winner Standings with 1st, 2nd, 3rd place, team name, and student names.
+     * Photo Album thumbnail strip (4 photos with "+X more" indicator).
+     * Photo Album Lightbox Modal: Full-screen interactive viewer.
+     * Official Certificate Verification Modal.
+
+3. OPPORTUNITIES RADAR (/opportunities):
+   - Filter tags: All, Hackathons, Internships, OpenSource, Remote.
+   - Cards display company/org name, deadline timer, and external application URL.
+
+4. IDEA HUB (/idea-hub):
+   - Pitch modal: Students submit proposed topic, category, and description.
+   - Real-time upvoting: Users vote on proposals they want organized.
+   - Moderation filter: Ideas approved or rejected by admins are excluded from view.
+
+5. MY REGISTRATIONS (/my-registrations):
+   - Student ticket wallet displaying passes for all registered events.
+   - QR Code: Unique token string (SDC_TICKET:userId:eventId).
+   - Live Status Badge: "PENDING CHECK-IN" or "✓ VERIFIED AT VENUE".
+   - Displays student name, roll number, college name, phone, team code, check-in time.
+
+6. ADMIN COMMAND CENTER (/admin):
+   - Protected: Displays "Access Denied" if user email is not in the admin whitelist.
+   - Real-Time Camera QR Scanner:
+     * Uses device camera to scan ticket QR codes.
+     * Enforces single-scan validation (alerts if ticket was already scanned).
+     * Plays audio confirmation tone upon successful check-in.
+   - Attendee Roster:
+     * Full table of registrants with instant search across name, email, roll, team.
+     * 1-click manual toggle to flip attendance status.
+   - HOD Official Attendance Report (.txt):
+     * Downloads formatted text report for academic heads and faculty.
+     * Segregated by Presentees vs Absentees.
+     * Subdivided by Host College students vs External College students.
+   - Recap Past Event Modal:
+     * Input event recap metadata (title, date, venue, attendance, description, cover).
+     * Paste multiple photo gallery URLs with live thumbnail previews.
+     * Input winner standings (Team Names, Student Member Names, Project Titles).
+     * Publishes completed recap to the past events ledger.
+   - Idea Hub Moderation Panel:
+     * Approve or reject pending student proposals.
+     * Approving pre-fills event creator and purges the pending idea.
+
+--------------------------------------------------------------------------------
+PART 5: DATA SCHEMAS & FIELD SPECIFICATIONS
+--------------------------------------------------------------------------------
+
+1. Collection: "events"
+{
+  id: string,
+  title: string,
+  category: 'workshop' | 'hackathon' | 'speaker' | 'contest',
+  status: 'draft' | 'open' | 'closed' | 'completed',
+  description: string,
+  image: string,
+  date: string,
+  location: string,
+  registration_start_time: string (ISO),
+  registration_end_time: string (ISO),
+  is_inter_college: boolean,
+  min_team_size: number,
+  max_team_size: number,
+  max_seats: number,
+  registered_count: number,
+  attendance_count?: number,
+  winners?: [
+    {
+      position: '1st Place' | '2nd Place' | '3rd Place',
+      teamOrName: string,
+      members?: string,
+      projectTitle?: string
+    }
+  ],
+  galleryImages?: string[],
+  createdAt: string
+}
+
+2. Collection: "event_registrations"
+{
+  id: string,
+  eventId: string,
+  eventTitle: string,
+  userId: string,
+  userEmail: string,
+  userName: string,
+  phoneNumber?: string,
+  collegeName: string,
+  rollNumber: string,
+  registrationType: 'solo' | 'team',
+  teamCode?: string,
+  teamName?: string,
+  checkedIn: boolean,
+  checkedInAt?: string (ISO),
+  registeredAt: string (ISO),
+  qrToken: string
+}
+
+3. Collection: "event_requests" (Idea Hub)
+{
+  id: string,
+  title: string,
+  category: string,
+  description: string,
+  submittedBy: string,
+  submittedByEmail: string,
+  votes: number,
+  votedUsers: string[],
+  status: 'pending' | 'approved' | 'rejected',
+  createdAt: string
+}
+
+4. Collection: "opportunities"
+{
+  id: string,
+  title: string,
+  organization: string,
+  category: 'hackathon' | 'internship' | 'opensource' | 'hiring',
+  tags: string[],
+  description: string,
+  externalUrl: string,
+  deadline: string (ISO)
+}
+
+--------------------------------------------------------------------------------
+PART 6: DATA INTEGRITY & BUSINESS RULES
+--------------------------------------------------------------------------------
+1. Payload Sanitization:
+   Cloud Firestore strictly rejects any document containing "undefined" values.
+   All payloads must pass through cleanObjectForFirestore() before addDoc or
+   updateDoc calls. Solo events must strip teamCode/teamName if undefined.
+
+2. Single-Scan Check-in Rule:
+   QR passes can only be scanned once for attendance. If checkedIn === true,
+   subsequent scans must be blocked with an explicit duplicate warning showing
+   the previous check-in timestamp.
+
+3. Institutional Segregation:
+   Users must specify whether they belong to the host institution or an external
+   university. Reports must subdivide presentees and absentees accordingly.
+
+4. Moderation Clearance:
+   When an idea proposal is approved or rejected by an admin, it must be purged
+   from the pending moderation panel and excluded from the public Idea Hub feed.
+
+================================================================================
+END OF SPECIFICATION FILE
+================================================================================

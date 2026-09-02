@@ -1,0 +1,295 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { 
+  onAuthStateChanged, 
+  signInWithPopup, 
+  signInWithRedirect, 
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  updateProfile,
+  getRedirectResult, 
+  signOut as firebaseSignOut, 
+  User as FirebaseUser 
+} from 'firebase/auth';
+import { auth, googleProvider, isFirebaseConfigured, ADMIN_WHITELIST, INTERNAL_COLLEGE_DOMAIN } from '../config/firebase';
+import { UserProfile, UserRole } from '../types';
+
+interface AuthContextType {
+  user: UserProfile | null;
+  loading: boolean;
+  role: UserRole;
+  isDemoMode: boolean;
+  signInWithGoogle: () => Promise<void>;
+  signInWithEmail: (email: string, pass: string) => Promise<void>;
+  signUpWithEmail: (email: string, pass: string, name: string, college?: string, roll?: string) => Promise<void>;
+  resendVerificationEmail: () => Promise<void>;
+  checkEmailVerification: () => Promise<boolean>;
+  signOutUser: () => Promise<void>;
+  setDemoRole: (role: UserRole) => void;
+  updateProfileDetails: (collegeName: string, rollNumber: string) => void;
+}
+
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+
+// Preset demo profiles for optional testing
+export const DEMO_PROFILES: Record<UserRole, UserProfile> = {
+  admin: {
+    uid: 'usr-admin-01',
+    email: 'adhyumna008@gmail.com',
+    displayName: 'Adhyumna Chowdary (Admin)',
+    photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
+    role: 'admin',
+    collegeName: 'Vardhaman College of Engineering',
+    rollNumber: 'ADM-2026-001',
+    qrToken: 'SDC_TICKET:usr-admin-01',
+    emailVerified: true
+  },
+  member: {
+    uid: 'usr-member-1',
+    email: 'alex.dev@vardhaman.org',
+    displayName: 'Alex Rivers',
+    photoURL: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80',
+    role: 'member',
+    collegeName: 'Vardhaman College of Engineering',
+    rollNumber: '21881A0501',
+    qrToken: 'SDC_TICKET:usr-member-1',
+    emailVerified: true
+  },
+  guest: {
+    uid: 'usr-guest-1',
+    email: 'johndoe@gmail.com',
+    displayName: 'John Doe (Guest)',
+    photoURL: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
+    role: 'guest',
+    collegeName: 'IIT Hyderabad',
+    rollNumber: 'IITH-2024-889',
+    qrToken: 'SDC_TICKET:usr-guest-1',
+    emailVerified: true
+  }
+};
+
+export const determineRoleFromEmail = (email: string): UserRole => {
+  if (!email) return 'guest';
+  const cleanEmail = email.toLowerCase().trim();
+  if (ADMIN_WHITELIST.includes(cleanEmail)) return 'admin';
+  if (cleanEmail.endsWith(`@${INTERNAL_COLLEGE_DOMAIN}`)) return 'member';
+  return 'guest';
+};
+
+const mapFirebaseUser = (fbUser: FirebaseUser, extra?: { collegeName?: string; rollNumber?: string }): UserProfile => {
+  const email = fbUser.email || '';
+  const role = determineRoleFromEmail(email);
+  return {
+    uid: fbUser.uid,
+    email,
+    displayName: fbUser.displayName || email.split('@')[0] || 'SDC Member',
+    photoURL: fbUser.photoURL || undefined,
+    role,
+    collegeName: extra?.collegeName || (role === 'member' || role === 'admin' ? 'Vardhaman College of Engineering' : 'External College'),
+    rollNumber: extra?.rollNumber || 'REG-2026-000',
+    qrToken: `SDC_TICKET:${fbUser.uid}`,
+    emailVerified: fbUser.emailVerified
+  };
+};
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [isDemoMode, setIsDemoMode] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (isFirebaseConfigured) {
+      // 1. Process redirect result if returning from accounts.google.com
+      getRedirectResult(auth)
+        .then((result) => {
+          if (result && result.user) {
+            console.log('Redirect sign in success for:', result.user.email);
+            setUser(mapFirebaseUser(result.user));
+            setIsDemoMode(false);
+          }
+        })
+        .catch((err) => {
+          console.warn('Redirect result error or standard load:', err);
+        });
+
+      // 2. Listen to active auth state
+      const unsubscribe = onAuthStateChanged(auth, (fbUser: FirebaseUser | null) => {
+        if (fbUser) {
+          setUser(mapFirebaseUser(fbUser));
+          setIsDemoMode(false);
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      });
+      return () => unsubscribe();
+    } else {
+      setUser(null);
+      setLoading(false);
+    }
+  }, []);
+
+  const signInWithGoogle = async () => {
+    if (isFirebaseConfigured) {
+      try {
+        // Try popup first; if popup is blocked by browser/Brave, seamlessly use redirect!
+        const res = await signInWithPopup(auth, googleProvider);
+        if (res.user) {
+          setUser(mapFirebaseUser(res.user));
+        }
+      } catch (err: any) {
+        console.warn('Popup blocked/failed, switching to Google redirect:', err);
+        try {
+          await signInWithRedirect(auth, googleProvider);
+        } catch (redirectErr) {
+          console.error('Redirect sign in error', redirectErr);
+          throw redirectErr;
+        }
+      }
+    } else {
+      alert('Firebase API keys not configured. Enabling Demo Admin Mode for testing.');
+      setUser(DEMO_PROFILES.admin);
+      setIsDemoMode(true);
+    }
+  };
+
+  const signInWithEmail = async (email: string, pass: string) => {
+    const cleanEmail = email.trim();
+    if (isFirebaseConfigured) {
+      const res = await signInWithEmailAndPassword(auth, cleanEmail, pass);
+      if (res.user) {
+        setUser(mapFirebaseUser(res.user));
+      }
+    } else {
+      const role = determineRoleFromEmail(cleanEmail);
+      setUser({
+        uid: `demo-${Date.now()}`,
+        email: cleanEmail,
+        displayName: cleanEmail.split('@')[0],
+        role,
+        collegeName: role === 'member' || role === 'admin' ? 'Vardhaman College of Engineering' : 'External College',
+        rollNumber: 'REG-2026-DEMO',
+        qrToken: `SDC_TICKET:demo`
+      });
+      setIsDemoMode(true);
+    }
+  };
+
+  const signUpWithEmail = async (email: string, pass: string, name: string, college?: string, roll?: string) => {
+    const cleanEmail = email.trim();
+    const cleanName = (name || cleanEmail.split('@')[0]).trim();
+    if (isFirebaseConfigured) {
+      try {
+        const res = await createUserWithEmailAndPassword(auth, cleanEmail, pass);
+        if (res.user) {
+          try {
+            await updateProfile(res.user, { displayName: cleanName });
+          } catch (profileErr) {
+            console.warn('Profile update warning:', profileErr);
+          }
+
+          // Dispatches official verification link to email on first-time account creation
+          try {
+            await sendEmailVerification(res.user, {
+              url: window.location.origin,
+              handleCodeInApp: false
+            });
+            console.log('Official email verification link dispatched to:', cleanEmail);
+          } catch (verifErr) {
+            console.warn('Could not dispatch verification email:', verifErr);
+          }
+
+          setUser(mapFirebaseUser(res.user, { collegeName: college, rollNumber: roll }));
+        }
+      } catch (err: any) {
+        // If email already exists, gracefully sign in with the provided password!
+        if (err.code === 'auth/email-already-in-use') {
+          console.log('Account already exists. Attempting direct sign-in...');
+          const signRes = await signInWithEmailAndPassword(auth, cleanEmail, pass);
+          if (signRes.user) {
+            setUser(mapFirebaseUser(signRes.user, { collegeName: college, rollNumber: roll }));
+            return;
+          }
+        }
+        throw err;
+      }
+    } else {
+      const role = determineRoleFromEmail(cleanEmail);
+      setUser({
+        uid: `demo-${Date.now()}`,
+        email: cleanEmail,
+        displayName: cleanName,
+        role,
+        collegeName: college || (role === 'member' || role === 'admin' ? 'Vardhaman College of Engineering' : 'External College'),
+        rollNumber: roll || 'REG-2026-DEMO',
+        qrToken: `SDC_TICKET:demo`,
+        emailVerified: true
+      });
+      setIsDemoMode(true);
+    }
+  };
+
+  const resendVerificationEmail = async () => {
+    if (isFirebaseConfigured && auth.currentUser) {
+      await sendEmailVerification(auth.currentUser, {
+        url: window.location.origin,
+        handleCodeInApp: false
+      });
+      console.log('Verification link re-sent to:', auth.currentUser.email);
+    }
+  };
+
+  const checkEmailVerification = async (): Promise<boolean> => {
+    if (isFirebaseConfigured && auth.currentUser) {
+      await auth.currentUser.reload();
+      const verified = auth.currentUser.emailVerified;
+      if (verified && user) {
+        setUser({ ...user, emailVerified: true });
+      }
+      return verified;
+    }
+    return true;
+  };
+
+  const signOutUser = async () => {
+    if (isFirebaseConfigured && auth.currentUser) {
+      await firebaseSignOut(auth);
+    }
+    setUser(null);
+    setIsDemoMode(false);
+  };
+
+  const setDemoRole = (targetRole: UserRole) => {
+    setUser(DEMO_PROFILES[targetRole]);
+    setIsDemoMode(true);
+  };
+
+  const updateProfileDetails = (collegeName: string, rollNumber: string) => {
+    if (user) {
+      setUser({ ...user, collegeName, rollNumber });
+    }
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        role: user?.role || 'guest',
+        isDemoMode,
+        signInWithGoogle,
+        signInWithEmail,
+        signUpWithEmail,
+        resendVerificationEmail,
+        checkEmailVerification,
+        signOutUser,
+        setDemoRole,
+        updateProfileDetails
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);

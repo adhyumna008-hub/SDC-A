@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email in [
+          'adhyumna008@gmail.com',
+          'studentdevelopersclub88@gmail.com',
+          'admin@vardhaman.org',
+          'sdc.admin@vardhaman.org',
+          'president.sdc@vardhaman.org'
+        ]
+      );
+    }
+    
+    function isCollegeMember() {
+      return isSignedIn() && (
+        request.auth.token.email.endsWith('@vardhaman.org') || isAdmin()
+      );
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Events Collection - allow public read, and create/update/delete for dashboard operations
+    match /events/{eventId} {
+      allow read, write: if true;
+    }
+
+    // Event Registrations Collection - public read for attendance verification and registration
+    match /event_registrations/{regId} {
+      allow read, write: if true;
+    }
+
+    // Idea Hub Requests Collection - public read, write & delete for moderation clearance
+    match /event_requests/{requestId} {
+      allow read, write: if true;
+    }
+
+    // Opportunities Collection
+    match /opportunities/{oppId} {
+      allow read, write: if true;
+    }
+  }
+}
