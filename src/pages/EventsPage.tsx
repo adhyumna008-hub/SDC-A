@@ -5,7 +5,6 @@ import { EventItem, EventRegistration } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { RegistrationModal } from '../components/RegistrationModal';
 import { CertificateModal } from '../components/CertificateModal';
-import { PhotoAlbumModal } from '../components/PhotoAlbumModal';
 
 export const EventsPage: React.FC = () => {
   const { user, role } = useAuth();
@@ -13,14 +12,12 @@ export const EventsPage: React.FC = () => {
 
   const [events, setEvents] = useState<EventItem[]>([]);
   const [userRegistrations, setUserRegistrations] = useState<EventRegistration[]>([]);
-  const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [interCollegeOnly, setInterCollegeOnly] = useState<boolean>(role === 'guest');
 
   // Modal states
   const [registeringEvent, setRegisteringEvent] = useState<EventItem | null>(null);
   const [certificateEvent, setCertificateEvent] = useState<EventItem | null>(null);
-  const [viewingGalleryEvent, setViewingGalleryEvent] = useState<EventItem | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
   useEffect(() => {
@@ -41,15 +38,9 @@ export const EventsPage: React.FC = () => {
     };
   }, [user?.uid]);
 
-  const upcomingEvents = events.filter(e => {
+  const filteredEvents = events.filter(e => {
     if (e.status === 'completed') return false;
     if (interCollegeOnly && !e.is_inter_college) return false;
-    if (selectedCategory !== 'all' && e.category !== selectedCategory) return false;
-    return true;
-  });
-
-  const pastEvents = events.filter(e => {
-    if (e.status !== 'completed') return false;
     if (selectedCategory !== 'all' && e.category !== selectedCategory) return false;
     return true;
   });
@@ -93,33 +84,8 @@ export const EventsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Clean Navigation & Filter Bar (UX Pilot Pill Tabs Style) */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-10 pb-6 border-b border-white/10">
-        {/* Main Tabs (Upcoming vs Past) */}
-        <div className="flex items-center gap-1.5 p-1 bg-[#0a0a0f] rounded-full border border-white/10">
-          <button
-            onClick={() => setActiveTab('upcoming')}
-            className={`px-6 py-2 rounded-full text-xs font-bold transition-all ${
-              activeTab === 'upcoming'
-                ? 'bg-white text-black shadow-sm'
-                : 'text-white/60 hover:text-white'
-            }`}
-          >
-            Upcoming ({upcomingEvents.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('past')}
-            className={`px-6 py-2 rounded-full text-xs font-bold transition-all ${
-              activeTab === 'past'
-                ? 'bg-white text-black shadow-sm'
-                : 'text-white/60 hover:text-white'
-            }`}
-          >
-            Past Events ({pastEvents.length})
-          </button>
-        </div>
-
-        {/* Category Pills (All, Workshops, Hackathons, Speaker Talks) */}
+      {/* Category Pills & Filters */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-10 pb-6 border-b border-white/10">
         <div className="flex flex-wrap items-center gap-2">
           {['all', 'workshop', 'hackathon', 'speaker'].map((cat) => (
             <button
@@ -142,15 +108,18 @@ export const EventsPage: React.FC = () => {
               onChange={(e) => setInterCollegeOnly(e.target.checked)}
               className="rounded bg-white/10 border-white/20 text-[#A855F7] focus:ring-0"
             />
-            <span className="text-[11px] mono">Inter-College</span>
+            <span className="text-[11px] mono">Inter-College Only</span>
           </label>
+        </div>
+
+        <div className="text-xs text-white/50 mono font-medium">
+          Showing <span className="text-white font-bold">{filteredEvents.length}</span> Active {filteredEvents.length === 1 ? 'Event' : 'Events'}
         </div>
       </div>
 
-      {/* UPCOMING EVENTS GRID */}
-      {activeTab === 'upcoming' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {upcomingEvents.map((evt) => {
+      {/* EVENTS GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredEvents.map((evt) => {
             const now = new Date().getTime();
             const start = evt.registration_start_time ? new Date(evt.registration_start_time).getTime() : 0;
             const end = evt.registration_end_time ? new Date(evt.registration_end_time).getTime() : Infinity;
@@ -310,131 +279,13 @@ export const EventsPage: React.FC = () => {
             );
           })}
 
-          {upcomingEvents.length === 0 && (
+          {filteredEvents.length === 0 && (
             <div className="col-span-full py-16 text-center text-on-surface-variant font-code-sm bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10">
               <span className="material-symbols-outlined text-5xl mb-3 text-neon-purple">event_busy</span>
-              <p>No upcoming events matching your selected filters.</p>
+              <p>No events matching your selected filters.</p>
             </div>
           )}
-        </div>
-      )}
-
-      {/* PAST EVENTS GRID */}
-      {activeTab === 'past' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pastEvents.map((evt) => (
-            <article
-              key={evt.id}
-              className="backdrop-blur-2xl bg-gradient-to-b from-[#131b2e]/80 via-[#0b1326]/90 to-[#060e20]/90 border border-white/15 ring-1 ring-white/10 rounded-3xl overflow-hidden flex flex-col group hover:border-white/30 transition-all duration-300 shadow-lg"
-            >
-              <div className="h-48 w-full relative overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-500">
-                <img src={evt.image} alt={evt.title} className="w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-deep-black/50 group-hover:bg-deep-black/20 transition-colors"></div>
-                <div className="absolute top-4 left-4">
-                  <span className="font-label-caps text-[10px] bg-white/10 text-white px-3 py-1 rounded-xl backdrop-blur-md uppercase font-bold border border-white/20">
-                    COMPLETED
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-6 flex flex-col flex-grow">
-                <h3 className="font-headline-lg text-lg font-bold text-white mb-2">
-                  {evt.title}
-                </h3>
-                <div className="flex items-center gap-2 text-on-surface-variant text-xs font-code-sm mb-4">
-                  <span className="material-symbols-outlined text-sm">history</span>
-                  <span>{evt.date} • {evt.attendance_count || evt.registered_count} Attendees</span>
-                </div>
-
-                <p className="text-on-surface-variant text-xs md:text-sm mb-4 leading-relaxed line-clamp-2">
-                  {evt.description}
-                </p>
-
-                {/* Winners section */}
-                {evt.winners && evt.winners.length > 0 && (
-                  <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-3.5 mb-4 space-y-2 font-code-sm text-xs backdrop-blur-md">
-                    <div className="text-amber-300 font-bold flex items-center gap-1.5 mb-1">
-                      <span className="material-symbols-outlined text-sm text-amber-400">emoji_events</span>
-                      <span>Winner Standings</span>
-                    </div>
-                    {evt.winners.map((w, idx) => (
-                      <div key={idx} className="border-b border-white/5 pb-1.5 last:border-0 last:pb-0 space-y-0.5">
-                        <div className="flex justify-between items-center text-on-surface">
-                          <span className="text-electric-cyan font-bold">{w.position}:</span>
-                          <span className="truncate text-white font-bold">{w.teamOrName}</span>
-                        </div>
-                        {w.members && (
-                          <div className="text-[11px] text-on-surface-variant truncate">
-                            <span className="text-white/60">Members:</span> {w.members}
-                          </div>
-                        )}
-                        {w.projectTitle && (
-                          <div className="text-[11px] text-amber-300/80 truncate">
-                            <span className="text-white/60">Project:</span> {w.projectTitle}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Photo Album Preview Strip */}
-                {evt.galleryImages && evt.galleryImages.length > 0 && (
-                  <div className="mb-4 space-y-2">
-                    <div className="flex items-center justify-between text-[11px] font-code-sm text-on-surface-variant">
-                      <span className="flex items-center gap-1 text-white font-bold">
-                        <span className="material-symbols-outlined text-xs text-neon-purple">photo_camera</span>
-                        <span>Event Photo Album</span>
-                      </span>
-                      <span className="text-neon-purple font-bold">
-                        {evt.galleryImages.length} Photos
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-4 gap-1.5">
-                      {evt.galleryImages.slice(0, 4).map((img, i) => (
-                        <div
-                          key={i}
-                          onClick={() => setViewingGalleryEvent(evt)}
-                          className="relative h-14 rounded-xl overflow-hidden cursor-pointer border border-white/10 hover:border-neon-purple transition-all group/thumb"
-                        >
-                          <img src={img} alt="album thumb" className="w-full h-full object-cover group-hover/thumb:scale-110 transition-transform duration-300" />
-                          {i === 3 && evt.galleryImages!.length > 4 && (
-                            <div className="absolute inset-0 bg-deep-black/75 flex items-center justify-center text-white font-bold text-xs">
-                              +{evt.galleryImages!.length - 4}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="mt-auto pt-4 border-t border-white/10 flex flex-wrap gap-2 justify-between items-center">
-                  {evt.galleryImages && evt.galleryImages.length > 0 ? (
-                    <button
-                      onClick={() => setViewingGalleryEvent(evt)}
-                      className="font-label-caps text-xs bg-neon-purple/20 text-neon-purple border border-neon-purple/40 hover:bg-neon-purple hover:text-white px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 font-bold shadow-[0_0_10px_rgba(168,85,247,0.25)]"
-                    >
-                      <span className="material-symbols-outlined text-sm">photo_library</span>
-                      <span>View Gallery</span>
-                    </button>
-                  ) : (
-                    <div></div>
-                  )}
-
-                  <button
-                    onClick={() => setCertificateEvent(evt)}
-                    className="font-label-caps text-xs text-electric-cyan hover:text-white transition-colors flex items-center gap-1.5 font-bold"
-                  >
-                    <span>Certificate</span>
-                    <span className="material-symbols-outlined text-sm">verified</span>
-                  </button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-      )}
+      </div>
 
       {/* Registration Modal */}
       {registeringEvent && (
@@ -451,14 +302,6 @@ export const EventsPage: React.FC = () => {
           event={certificateEvent}
           winnerInfo={certificateEvent.winners ? certificateEvent.winners[0] : undefined}
           onClose={() => setCertificateEvent(null)}
-        />
-      )}
-
-      {/* Photo Album Lightbox Modal */}
-      {viewingGalleryEvent && (
-        <PhotoAlbumModal
-          event={viewingGalleryEvent}
-          onClose={() => setViewingGalleryEvent(null)}
         />
       )}
     </main>
