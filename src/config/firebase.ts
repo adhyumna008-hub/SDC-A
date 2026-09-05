@@ -33,7 +33,8 @@ export const ADMIN_WHITELIST = [
   'adhyumna008@gmail.com',
   'studentdevelopersclub88@gmail.com',
   'nalub9267@gmail.com',
-  'rehanstudy4@gmail.com'
+  'rehanstudy4@gmail.com',
+  'manimoukthika3699@gmail.com'
 ];
 
 export const INTERNAL_COLLEGE_DOMAIN = 'vardhaman.org';
