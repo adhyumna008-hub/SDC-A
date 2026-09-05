@@ -32,7 +32,8 @@ export const AdminDashboard: React.FC = () => {
   const [adminNavTab, setAdminNavTab] = useState<'overview' | 'payments' | 'events' | 'ideas'>('payments');
   const [paymentSearchQuery, setPaymentSearchQuery] = useState('');
   const [paymentFilterStatus, setPaymentFilterStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
-  const [viewingRegForVerification, setViewingRegForVerification] = useState<EventRegistration | null>(null);
+  const [selectedPaymentIds, setSelectedPaymentIds] = useState<string[]>([]);
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
 
   // Modals & Panels
   const [showNewEventModal, setShowNewEventModal] = useState(false);
@@ -635,6 +636,39 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  const handleBulkApprove = async () => {
+    if (selectedPaymentIds.length === 0) return;
+    setIsBulkProcessing(true);
+    try {
+      for (const id of selectedPaymentIds) {
+        await updateRegistrationPaymentStatusService(id, 'approved');
+      }
+      setRegistrations(prev => prev.map(r => selectedPaymentIds.includes(r.id) ? { ...r, paymentStatus: 'approved', status: 'confirmed' } : r));
+      setSelectedPaymentIds([]);
+    } catch (e) {
+      console.error('Bulk approve error:', e);
+    } finally {
+      setIsBulkProcessing(false);
+    }
+  };
+
+  const handleBulkReject = async () => {
+    if (selectedPaymentIds.length === 0) return;
+    if (!confirm(`Are you sure you want to reject ${selectedPaymentIds.length} selected payment(s)?`)) return;
+    setIsBulkProcessing(true);
+    try {
+      for (const id of selectedPaymentIds) {
+        await updateRegistrationPaymentStatusService(id, 'rejected');
+      }
+      setRegistrations(prev => prev.map(r => selectedPaymentIds.includes(r.id) ? { ...r, paymentStatus: 'rejected', status: 'cancelled' } : r));
+      setSelectedPaymentIds([]);
+    } catch (e) {
+      console.error('Bulk reject error:', e);
+    } finally {
+      setIsBulkProcessing(false);
+    }
+  };
+
   const handleRejectPayment = async (reg: EventRegistration) => {
     if (!confirm(`Are you sure you want to reject the payment for ${reg.userName} (UTR: ${reg.utrNumber || 'N/A'})?`)) {
       return;
@@ -928,6 +962,94 @@ export const AdminDashboard: React.FC = () => {
               )}
             </div>
 
+            {/* Bulk Actions Bar */}
+            {(() => {
+              const pendingRegs = registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'pending_review');
+              const allVisiblePaidIds = registrations.filter(r => {
+                if (r.passType !== 'paid') return false;
+                if (paymentFilterStatus === 'pending' && r.paymentStatus !== 'pending_review') return false;
+                if (paymentFilterStatus === 'approved' && r.paymentStatus !== 'approved') return false;
+                if (paymentFilterStatus === 'rejected' && r.paymentStatus !== 'rejected') return false;
+                return true;
+              }).map(r => r.id);
+
+              const isAllSelected = allVisiblePaidIds.length > 0 && allVisiblePaidIds.every(id => selectedPaymentIds.includes(id));
+
+              return (
+                <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-xs">
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-2 cursor-pointer font-bold text-white select-none">
+                      <input
+                        type="checkbox"
+                        checked={isAllSelected}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedPaymentIds(allVisiblePaidIds);
+                          } else {
+                            setSelectedPaymentIds([]);
+                          }
+                        }}
+                        className="w-4 h-4 rounded bg-black/40 border-white/20 text-amber-500 focus:ring-0 cursor-pointer"
+                      />
+                      <span>Select All Visible ({allVisiblePaidIds.length})</span>
+                    </label>
+
+                    {selectedPaymentIds.length > 0 && (
+                      <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono font-bold">
+                        {selectedPaymentIds.length} Selected
+                      </span>
+                    )}
+                  </div>
+
+                  {selectedPaymentIds.length > 0 ? (
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={handleBulkApprove}
+                        disabled={isBulkProcessing}
+                        className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black font-bold font-mono shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      >
+                        <span className="material-symbols-outlined text-sm">done_all</span>
+                        <span>{isBulkProcessing ? 'Approving...' : `Approve (${selectedPaymentIds.length}) Passes`}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleBulkReject}
+                        disabled={isBulkProcessing}
+                        className="px-3.5 py-2 rounded-xl bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40 font-bold font-mono transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      >
+                        <span className="material-symbols-outlined text-sm">close</span>
+                        <span>Reject Selected</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPaymentIds([])}
+                        className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all"
+                      >
+                        Deselect
+                      </button>
+                    </div>
+                  ) : (
+                    pendingRegs.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const ids = pendingRegs.map(r => r.id);
+                          setSelectedPaymentIds(ids);
+                        }}
+                        className="text-amber-300 hover:text-amber-200 text-xs font-mono font-bold underline flex items-center gap-1 cursor-pointer"
+                      >
+                        <span className="material-symbols-outlined text-xs">checklist</span>
+                        <span>Select All {pendingRegs.length} Pending Passes</span>
+                      </button>
+                    )
+                  )}
+                </div>
+              );
+            })()}
+
             {/* List of Payments for Review */}
             {(() => {
               const paidList = registrations.filter(r => {
@@ -970,21 +1092,36 @@ export const AdminDashboard: React.FC = () => {
                     const isPending = reg.paymentStatus === 'pending_review';
                     const isApproved = reg.paymentStatus === 'approved';
                     const isRejected = reg.paymentStatus === 'rejected';
+                    const isSelected = selectedPaymentIds.includes(reg.id);
 
                     return (
                       <div
                         key={reg.id}
                         className={`rounded-3xl p-5 border flex flex-col justify-between gap-4 transition-all relative overflow-hidden ${
-                          isPending
+                          isSelected
+                            ? 'ring-2 ring-amber-400 bg-amber-500/10 border-amber-400/80 shadow-[0_0_30px_rgba(245,158,11,0.25)]'
+                            : isPending
                             ? 'bg-gradient-to-b from-[#181a10] to-[#0c0d0a] border-amber-500/40 shadow-[0_0_25px_rgba(245,158,11,0.12)]'
                             : isApproved
                             ? 'bg-gradient-to-b from-[#091a14] to-[#050e0a] border-emerald-500/30'
                             : 'bg-white/[0.02] border-white/10'
                         }`}
                       >
-                        {/* Status Header Strip */}
+                        {/* Status Header Strip with Checkbox */}
                         <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2.5">
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedPaymentIds(prev => [...prev, reg.id]);
+                                } else {
+                                  setSelectedPaymentIds(prev => prev.filter(id => id !== reg.id));
+                                }
+                              }}
+                              className="w-4 h-4 rounded bg-black/40 border-white/20 text-amber-500 focus:ring-0 cursor-pointer"
+                            />
                             <span className="text-xs font-mono font-bold text-white/70">
                               {reg.eventTitle || 'Event Pass'}
                             </span>
