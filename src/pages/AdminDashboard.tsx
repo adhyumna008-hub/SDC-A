@@ -28,8 +28,10 @@ export const AdminDashboard: React.FC = () => {
   const [ideas, setIdeas] = useState<IdeaHubRequest[]>([]);
   const [registrations, setRegistrations] = useState<EventRegistration[]>([]);
 
-  // Main Dashboard Navigation Tabs
-  const [adminNavTab, setAdminNavTab] = useState<'overview' | 'payments' | 'events' | 'ideas'>('payments');
+  // Main Dashboard Navigation & Drawer
+  const [adminNavTab, setAdminNavTab] = useState<'payments' | 'events' | 'ideas' | 'overview'>('payments');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedEventIdForPayments, setSelectedEventIdForPayments] = useState<string>('all');
   const [paymentSearchQuery, setPaymentSearchQuery] = useState('');
   const [paymentFilterStatus, setPaymentFilterStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
   const [selectedPaymentIds, setSelectedPaymentIds] = useState<string[]>([]);
@@ -694,26 +696,47 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <main className="flex-1 flex flex-col min-h-screen bg-background relative pt-20">
-      {/* Header */}
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-container-padding py-4 border-b border-outline-variant/10 bg-surface/80 backdrop-blur-md z-10 sticky top-16">
-        <h1 className="font-headline-lg text-xl md:text-2xl text-on-surface flex items-center gap-3 font-bold">
-          <span className="material-symbols-outlined text-neon-purple text-3xl">admin_panel_settings</span>
-          Command Center Terminal
-        </h1>
+      {/* Header with 3-Line Menu Button */}
+      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-container-padding py-4 border-b border-outline-variant/10 bg-surface/80 backdrop-blur-md z-20 sticky top-16">
+        <div className="flex items-center gap-3">
+          {/* 3-Line Menu Button (Admin Navigation Drawer) */}
+          <button
+            type="button"
+            onClick={() => setIsDrawerOpen(true)}
+            className="w-10 h-10 rounded-2xl bg-white/[0.06] hover:bg-neon-purple/20 border border-white/15 hover:border-neon-purple/50 text-white flex items-center justify-center transition-all shadow-soft-ui cursor-pointer group"
+            title="Open Admin Navigation Menu"
+          >
+            <span className="material-symbols-outlined text-xl text-white/80 group-hover:text-neon-purple group-hover:scale-110 transition-transform">
+              menu
+            </span>
+          </button>
+
+          <h1 className="font-headline-lg text-xl md:text-2xl text-on-surface flex items-center gap-2.5 font-bold">
+            <span className="material-symbols-outlined text-neon-purple text-2xl">admin_panel_settings</span>
+            <span>Command Center</span>
+          </h1>
+
+          {/* Active Tab Chip Indicator */}
+          <span className="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs font-mono font-bold text-white/70 ml-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-neon-purple animate-pulse"></span>
+            <span>
+              {adminNavTab === 'payments' ? 'UPI Verification' : adminNavTab === 'events' ? 'Events & Roster' : adminNavTab === 'ideas' ? 'Idea Hub Moderation' : 'System Settings'}
+            </span>
+          </span>
+        </div>
 
         <div className="flex flex-wrap items-center gap-2.5 mt-3 sm:mt-0">
           <button
             onClick={() => setShowQRScanner(true)}
-            className="bg-white text-black hover:bg-white/90 px-4 py-2 rounded-full font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm"
+            className="bg-white text-black hover:bg-white/90 px-4 py-2 rounded-full font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
           >
             <span className="material-symbols-outlined text-sm">qr_code_scanner</span>
             <span>QR Scanner</span>
           </button>
 
-
           <button
             onClick={() => setShowNewOppModal(true)}
-            className="bg-[#12121a] border border-[#1f1f2e] text-white/80 hover:text-white hover:border-white px-4 py-2 rounded-full font-bold text-xs transition-all flex items-center gap-1.5"
+            className="bg-[#12121a] border border-[#1f1f2e] text-white/80 hover:text-white hover:border-white px-4 py-2 rounded-full font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <span className="material-symbols-outlined text-sm text-electric-cyan">hub</span>
             <span>Publish Opportunity</span>
@@ -738,78 +761,175 @@ export const AdminDashboard: React.FC = () => {
         </div>
       </header>
 
+      {/* Slide-out Navigation Drawer (Appears when 3-line hamburger button is clicked) */}
+      {isDrawerOpen && (
+        <div className="fixed inset-0 z-[99999] flex animate-fadeIn">
+          {/* Backdrop */}
+          <div 
+            onClick={() => setIsDrawerOpen(false)}
+            className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity"
+          ></div>
+
+          {/* Drawer Menu Panel */}
+          <div className="relative w-80 max-w-[85vw] h-full bg-[#080d1a] border-r border-white/15 p-6 flex flex-col justify-between shadow-2xl z-10 animate-slideRight">
+            <div className="space-y-6">
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-neon-purple/20 border border-neon-purple/50 flex items-center justify-center text-neon-purple shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                    <span className="material-symbols-outlined text-lg">admin_panel_settings</span>
+                  </div>
+                  <div>
+                    <h3 className="font-headline-lg text-white font-bold text-base leading-tight">Admin Terminal</h3>
+                    <p className="text-[10px] font-mono text-white/50">Navigation Panel</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsDrawerOpen(false)}
+                  className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-white/70 hover:text-white flex items-center justify-center border border-white/10 cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-sm">close</span>
+                </button>
+              </div>
+
+              {/* Navigation Options List */}
+              <nav className="space-y-2">
+                <button
+                  type="button"
+                  onClick={() => { setAdminNavTab('payments'); setIsDrawerOpen(false); }}
+                  className={`w-full p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
+                    adminNavTab === 'payments'
+                      ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.2)]'
+                      : 'bg-white/[0.03] border-white/10 text-white/70 hover:bg-white/[0.08] hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-xl text-amber-400">receipt_long</span>
+                    <div>
+                      <div className="text-xs font-bold text-white">UPI & Screenshot Review</div>
+                      <div className="text-[10px] text-white/50">Verify UTR and entry passes</div>
+                    </div>
+                  </div>
+                  {registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'pending_review').length > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-amber-500 text-black text-[10px] font-mono font-bold animate-pulse">
+                      {registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'pending_review').length}
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => { setAdminNavTab('events'); setIsDrawerOpen(false); }}
+                  className={`w-full p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
+                    adminNavTab === 'events'
+                      ? 'bg-neon-purple/20 border-neon-purple/50 text-white shadow-[0_0_20px_rgba(168,85,247,0.2)]'
+                      : 'bg-white/[0.03] border-white/10 text-white/70 hover:bg-white/[0.08] hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-xl text-neon-purple">event_available</span>
+                    <div>
+                      <div className="text-xs font-bold text-white">Events & Attendance</div>
+                      <div className="text-[10px] text-white/50">Manage seats, roster & exports</div>
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full bg-white/10 text-white text-[10px] font-mono">
+                    {events.length}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => { setAdminNavTab('ideas'); setIsDrawerOpen(false); }}
+                  className={`w-full p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
+                    adminNavTab === 'ideas'
+                      ? 'bg-electric-cyan/20 border-electric-cyan/50 text-white shadow-[0_0_20px_rgba(56,189,248,0.2)]'
+                      : 'bg-white/[0.03] border-white/10 text-white/70 hover:bg-white/[0.08] hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-xl text-electric-cyan">how_to_vote</span>
+                    <div>
+                      <div className="text-xs font-bold text-white">Idea Hub Moderation</div>
+                      <div className="text-[10px] text-white/50">Community workshop proposals</div>
+                    </div>
+                  </div>
+                  {ideas.filter(i => i.status === 'pending').length > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-electric-cyan/20 text-electric-cyan text-[10px] font-mono font-bold">
+                      {ideas.filter(i => i.status === 'pending').length}
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => { setAdminNavTab('overview'); setIsDrawerOpen(false); }}
+                  className={`w-full p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
+                    adminNavTab === 'overview'
+                      ? 'bg-white/15 border-white/30 text-white shadow-sm'
+                      : 'bg-white/[0.03] border-white/10 text-white/70 hover:bg-white/[0.08] hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-xl text-white/80">dashboard</span>
+                    <div>
+                      <div className="text-xs font-bold text-white">System & Settings</div>
+                      <div className="text-[10px] text-white/50">Matrix toggles & status</div>
+                    </div>
+                  </div>
+                </button>
+              </nav>
+            </div>
+
+            {/* Drawer Footer */}
+            <div className="border-t border-white/10 pt-4 space-y-3">
+              <div className="flex items-center justify-between text-[11px] font-mono text-white/50">
+                <span>Database Status</span>
+                <span className="text-emerald-400 font-bold flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                  Live Sync
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setShowQRScanner(true); setIsDrawerOpen(false); }}
+                className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-base">qr_code_scanner</span>
+                <span>Launch QR Badge Scanner</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content Area */}
       <div className="p-container-padding space-y-8 max-w-7xl mx-auto w-full">
-        {/* Top Navigation Tabs Bar */}
+        {/* Sleek Subheader / View Indicator Bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
-          <div className="flex flex-wrap items-center gap-2 p-1.5 bg-[#0a0f1d] rounded-2xl border border-white/10 shadow-soft-ui">
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => setAdminNavTab('payments')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-                adminNavTab === 'payments'
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-[0_0_15px_rgba(245,158,11,0.4)]'
-                  : 'text-white/70 hover:text-white hover:bg-white/5'
-              }`}
+              type="button"
+              onClick={() => setIsDrawerOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/[0.05] hover:bg-neon-purple/20 border border-white/15 hover:border-neon-purple/50 text-white text-xs font-bold transition-all shadow-soft-ui cursor-pointer"
             >
-              <span className="material-symbols-outlined text-base">receipt_long</span>
-              <span>UPI & Screenshot Verification</span>
-              {registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'pending_review').length > 0 && (
-                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-extrabold ${
-                  adminNavTab === 'payments' ? 'bg-black text-amber-300' : 'bg-amber-500 text-black animate-pulse'
-                }`}>
-                  {registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'pending_review').length} PENDING
-                </span>
-              )}
+              <span className="material-symbols-outlined text-base text-neon-purple">menu</span>
+              <span>Switch Admin View</span>
+              <span className="material-symbols-outlined text-sm text-white/40">expand_more</span>
             </button>
 
-            <button
-              onClick={() => setAdminNavTab('events')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-                adminNavTab === 'events'
-                  ? 'bg-gradient-to-r from-neon-purple to-purple-600 text-white shadow-aurora'
-                  : 'text-white/70 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <span className="material-symbols-outlined text-base">event_available</span>
-              <span>Events & Attendance</span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-white/90">
-                {events.length}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-white/[0.03] border border-white/10 text-xs font-mono text-white/80">
+              <span className="text-white/40 uppercase text-[10px]">Active View:</span>
+              <span className="text-white font-bold">
+                {adminNavTab === 'payments' ? 'UPI & Screenshot Verification' : adminNavTab === 'events' ? 'Events & Attendance Roster' : adminNavTab === 'ideas' ? 'Idea Hub Moderation' : 'System & Settings'}
               </span>
-            </button>
-
-            <button
-              onClick={() => setAdminNavTab('ideas')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-                adminNavTab === 'ideas'
-                  ? 'bg-gradient-to-r from-electric-cyan to-blue-600 text-white shadow-[0_0_15px_rgba(56,189,248,0.4)]'
-                  : 'text-white/70 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <span className="material-symbols-outlined text-base">how_to_vote</span>
-              <span>Idea Hub Moderation</span>
-              {ideas.filter(i => i.status === 'pending').length > 0 && (
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-electric-cyan/20 text-electric-cyan font-bold">
-                  {ideas.filter(i => i.status === 'pending').length}
-                </span>
-              )}
-            </button>
-
-            <button
-              onClick={() => setAdminNavTab('overview')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-                adminNavTab === 'overview'
-                  ? 'bg-white/15 text-white shadow-sm border border-white/20'
-                  : 'text-white/70 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <span className="material-symbols-outlined text-base">dashboard</span>
-              <span>System & Settings</span>
-            </button>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 text-xs font-code-sm text-on-surface-variant">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>Live Firestore Listener Active</span>
+            <span>Real-time Firestore Connected</span>
           </div>
         </div>
 
@@ -942,31 +1062,66 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Search Bar for UTR / Student Name / Roll Number */}
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/40 text-lg">search</span>
-              <input
-                type="text"
-                placeholder="Search by 12-digit UTR Number, Student Name, Roll Number, or Email..."
-                value={paymentSearchQuery}
-                onChange={(e) => setPaymentSearchQuery(e.target.value)}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-2xl pl-11 pr-4 py-3 text-white text-xs placeholder-white/40 focus:outline-none focus:border-amber-500/60 focus:bg-white/[0.07] transition-all"
-              />
-              {paymentSearchQuery && (
-                <button
-                  onClick={() => setPaymentSearchQuery('')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white text-xs"
-                >
-                  Clear
-                </button>
-              )}
+            {/* Event Filter & Search Bar */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {/* Event Selector Dropdown */}
+              <div className="md:col-span-1">
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-neon-purple text-lg pointer-events-none">
+                    event
+                  </span>
+                  <select
+                    value={selectedEventIdForPayments}
+                    onChange={(e) => setSelectedEventIdForPayments(e.target.value)}
+                    className="w-full bg-[#0a1020] border border-white/15 rounded-2xl pl-10 pr-8 py-3 text-white text-xs font-bold focus:outline-none focus:border-neon-purple transition-all appearance-none cursor-pointer shadow-soft-ui"
+                  >
+                    <option value="all" className="bg-[#0a1020] text-white">
+                      All Events ({events.length})
+                    </option>
+                    {events.map((evt) => (
+                      <option key={evt.id} value={evt.id} className="bg-[#0a1020] text-white">
+                        {evt.title} ({registrations.filter(r => r.eventId === evt.id && r.passType === 'paid').length} Paid)
+                      </option>
+                    ))}
+                  </select>
+                  <span className="material-symbols-outlined absolute right-3.5 top-1/2 -translate-y-1/2 text-white/40 text-sm pointer-events-none">
+                    unfold_more
+                  </span>
+                </div>
+              </div>
+
+              {/* Search Bar for UTR / Student Name / Roll Number */}
+              <div className="md:col-span-2 relative">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/40 text-lg">search</span>
+                <input
+                  type="text"
+                  placeholder="Search by 12-digit UTR Number, Student Name, Roll Number, or Email..."
+                  value={paymentSearchQuery}
+                  onChange={(e) => setPaymentSearchQuery(e.target.value)}
+                  className="w-full bg-[#0a1020] border border-white/15 rounded-2xl pl-11 pr-4 py-3 text-white text-xs placeholder-white/40 focus:outline-none focus:border-amber-500/60 focus:bg-white/[0.07] transition-all shadow-soft-ui"
+                />
+                {paymentSearchQuery && (
+                  <button
+                    onClick={() => setPaymentSearchQuery('')}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white text-xs cursor-pointer"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Bulk Actions Bar */}
             {(() => {
-              const pendingRegs = registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'pending_review');
+              const pendingRegs = registrations.filter(r => {
+                if (r.passType !== 'paid' || r.paymentStatus !== 'pending_review') return false;
+                if (selectedEventIdForPayments !== 'all' && r.eventId !== selectedEventIdForPayments) return false;
+                return true;
+              });
+
               const allVisiblePaidIds = registrations.filter(r => {
                 if (r.passType !== 'paid') return false;
+                if (selectedEventIdForPayments !== 'all' && r.eventId !== selectedEventIdForPayments) return false;
                 if (paymentFilterStatus === 'pending' && r.paymentStatus !== 'pending_review') return false;
                 if (paymentFilterStatus === 'approved' && r.paymentStatus !== 'approved') return false;
                 if (paymentFilterStatus === 'rejected' && r.paymentStatus !== 'rejected') return false;
@@ -1054,6 +1209,7 @@ export const AdminDashboard: React.FC = () => {
             {(() => {
               const paidList = registrations.filter(r => {
                 if (r.passType !== 'paid') return false;
+                if (selectedEventIdForPayments !== 'all' && r.eventId !== selectedEventIdForPayments) return false;
                 if (paymentFilterStatus === 'pending' && r.paymentStatus !== 'pending_review') return false;
                 if (paymentFilterStatus === 'approved' && r.paymentStatus !== 'approved') return false;
                 if (paymentFilterStatus === 'rejected' && r.paymentStatus !== 'rejected') return false;
