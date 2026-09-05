@@ -139,11 +139,21 @@ export const Navbar: React.FC = () => {
           {/* User profile / Sign In button */}
           {user ? (
             <div className="flex items-center gap-2.5">
-              <img
-                src={user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'}
-                alt={user.displayName}
-                className="w-7 h-7 rounded-full border border-neon-purple/50 object-cover shadow-soft-ui"
-              />
+              <div className="relative">
+                <img
+                  src={user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'}
+                  alt={user.displayName}
+                  className="w-7 h-7 rounded-full border border-neon-purple/50 object-cover shadow-soft-ui"
+                />
+                {user.emailVerified && (
+                  <span 
+                    title="Verified Student Email"
+                    className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border border-deep-black flex items-center justify-center text-[9px] text-white"
+                  >
+                    ✓
+                  </span>
+                )}
+              </div>
               <button
                 onClick={signOutUser}
                 className="soft-ui-btn px-3 py-1 text-white/80 hover:text-white mono text-xs cursor-pointer"

@@ -112,7 +112,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.warn('Redirect result error or standard load:', err);
         });
 
-      // 2. Listen to active auth state
+      // 2. Process email verification action code if user clicked the link in their email
+      const urlParams = new URLSearchParams(window.location.search);
+      const mode = urlParams.get('mode');
+      const actionCode = urlParams.get('oobCode');
+
+      if (mode === 'verifyEmail' && actionCode) {
+        import('firebase/auth').then(({ applyActionCode }) => {
+          applyActionCode(auth, actionCode)
+            .then(async () => {
+              console.log('Email verified successfully via email link action code!');
+              if (auth.currentUser) {
+                await auth.currentUser.reload();
+                setUser(mapFirebaseUser(auth.currentUser));
+              }
+              // Clean URL query parameters smoothly without reloading
+              window.history.replaceState({}, document.title, window.location.pathname);
+            })
+            .catch((err) => {
+              console.warn('Action code verification error:', err);
+            });
+        });
+      }
+
+      // 3. Listen to active auth state
       const unsubscribe = onAuthStateChanged(auth, (fbUser: FirebaseUser | null) => {
         if (fbUser) {
           setUser(mapFirebaseUser(fbUser));

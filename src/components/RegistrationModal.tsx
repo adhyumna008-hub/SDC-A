@@ -99,6 +99,12 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
       return;
     }
 
+    if (!user.emailVerified) {
+      setErrorMsg('Your email address is not verified yet. Please check your inbox for the verification link sent when you registered, or sign in to verify.');
+      setShowAuthModal(true);
+      return;
+    }
+
     if (!fullName.trim()) {
       setErrorMsg('Please enter your full name.');
       return;
