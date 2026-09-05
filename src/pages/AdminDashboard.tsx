@@ -28,6 +28,12 @@ export const AdminDashboard: React.FC = () => {
   const [ideas, setIdeas] = useState<IdeaHubRequest[]>([]);
   const [registrations, setRegistrations] = useState<EventRegistration[]>([]);
 
+  // Main Dashboard Navigation Tabs
+  const [adminNavTab, setAdminNavTab] = useState<'overview' | 'payments' | 'events' | 'ideas'>('payments');
+  const [paymentSearchQuery, setPaymentSearchQuery] = useState('');
+  const [paymentFilterStatus, setPaymentFilterStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
+  const [viewingRegForVerification, setViewingRegForVerification] = useState<EventRegistration | null>(null);
+
   // Modals & Panels
   const [showNewEventModal, setShowNewEventModal] = useState(false);
   const [showNewOppModal, setShowNewOppModal] = useState(false);
@@ -700,78 +706,488 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Main Content Area */}
       <div className="p-container-padding space-y-8 max-w-7xl mx-auto w-full">
+        {/* Top Navigation Tabs Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
+          <div className="flex flex-wrap items-center gap-2 p-1.5 bg-[#0a0f1d] rounded-2xl border border-white/10 shadow-soft-ui">
+            <button
+              onClick={() => setAdminNavTab('payments')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                adminNavTab === 'payments'
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-[0_0_15px_rgba(245,158,11,0.4)]'
+                  : 'text-white/70 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <span className="material-symbols-outlined text-base">receipt_long</span>
+              <span>UPI & Screenshot Verification</span>
+              {registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'pending_review').length > 0 && (
+                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-extrabold ${
+                  adminNavTab === 'payments' ? 'bg-black text-amber-300' : 'bg-amber-500 text-black animate-pulse'
+                }`}>
+                  {registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'pending_review').length} PENDING
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => setAdminNavTab('events')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                adminNavTab === 'events'
+                  ? 'bg-gradient-to-r from-neon-purple to-purple-600 text-white shadow-aurora'
+                  : 'text-white/70 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <span className="material-symbols-outlined text-base">event_available</span>
+              <span>Events & Attendance</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/10 text-white/90">
+                {events.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setAdminNavTab('ideas')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                adminNavTab === 'ideas'
+                  ? 'bg-gradient-to-r from-electric-cyan to-blue-600 text-white shadow-[0_0_15px_rgba(56,189,248,0.4)]'
+                  : 'text-white/70 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <span className="material-symbols-outlined text-base">how_to_vote</span>
+              <span>Idea Hub Moderation</span>
+              {ideas.filter(i => i.status === 'pending').length > 0 && (
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-electric-cyan/20 text-electric-cyan font-bold">
+                  {ideas.filter(i => i.status === 'pending').length}
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => setAdminNavTab('overview')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                adminNavTab === 'overview'
+                  ? 'bg-white/15 text-white shadow-sm border border-white/20'
+                  : 'text-white/70 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <span className="material-symbols-outlined text-base">dashboard</span>
+              <span>System & Settings</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 text-xs font-code-sm text-on-surface-variant">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>Live Firestore Listener Active</span>
+          </div>
+        </div>
+
         {/* Top Row: System Status & Stats Cards */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="soft-ui-card rounded-3xl p-6 relative overflow-hidden group">
-            <div className="flex justify-between items-start mb-4">
-              <div className="font-label-caps text-xs text-on-surface-variant tracking-widest uppercase font-bold">SYSTEM STATUS</div>
-              <span className="material-symbols-outlined text-success-glow text-xl">dns</span>
+        <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="soft-ui-card rounded-3xl p-5 relative overflow-hidden group border border-white/10">
+            <div className="flex justify-between items-start mb-3">
+              <div className="font-label-caps text-[10px] text-amber-400 tracking-widest uppercase font-bold flex items-center gap-1">
+                <span className="material-symbols-outlined text-xs">hourglass_top</span>
+                <span>PENDING REVIEWS</span>
+              </div>
             </div>
-            <div className="text-3xl font-bold font-headline-xl text-success-glow mb-2">Optimal</div>
-            <div className="flex gap-2 font-code-sm text-xs text-on-surface-variant">
-              <span className="soft-ui-chip px-2.5 py-1 rounded-full">DB: Firestore Sync</span>
-              <span className="soft-ui-chip px-2.5 py-1 rounded-full">RBAC: Active</span>
+            <div className="text-2xl font-bold font-headline-xl text-amber-300 mb-1">
+              {registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'pending_review').length}
             </div>
+            <p className="text-[11px] text-white/50">Unverified UPI UTR submissions</p>
           </div>
 
-          <div className="soft-ui-card rounded-3xl p-6 relative overflow-hidden group">
-            <div className="flex justify-between items-start mb-4">
-              <div className="font-label-caps text-xs text-on-surface-variant tracking-widest uppercase font-bold">ACTIVE REGISTRATIONS</div>
-              <span className="material-symbols-outlined text-electric-cyan text-xl">group</span>
+          <div className="soft-ui-card rounded-3xl p-5 relative overflow-hidden group border border-white/10">
+            <div className="flex justify-between items-start mb-3">
+              <div className="font-label-caps text-[10px] text-emerald-400 tracking-widest uppercase font-bold flex items-center gap-1">
+                <span className="material-symbols-outlined text-xs">verified</span>
+                <span>APPROVED PASSES</span>
+              </div>
             </div>
-            <div className="text-3xl font-bold font-headline-xl text-white mb-2">{registrations.length + 342}</div>
-            <div className="w-full bg-surface-container-low h-1.5 rounded-full overflow-hidden">
-              <div className="bg-electric-cyan h-full w-[70%] rounded-full shadow-[0_0_10px_#0EA5E9]"></div>
+            <div className="text-2xl font-bold font-headline-xl text-emerald-300 mb-1">
+              {registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'approved').length}
             </div>
+            <p className="text-[11px] text-white/50">Verified entry QR tickets issued</p>
           </div>
 
-          <div className="soft-ui-card rounded-3xl p-6 relative overflow-hidden group">
-            <div className="flex justify-between items-start mb-4">
-              <div className="font-label-caps text-xs text-on-surface-variant tracking-widest uppercase font-bold">PENDING PROPOSALS</div>
-              <span className="material-symbols-outlined text-tertiary text-xl">lightbulb</span>
+          <div className="soft-ui-card rounded-3xl p-5 relative overflow-hidden group border border-white/10">
+            <div className="flex justify-between items-start mb-3">
+              <div className="font-label-caps text-[10px] text-electric-cyan tracking-widest uppercase font-bold flex items-center gap-1">
+                <span className="material-symbols-outlined text-xs">group</span>
+                <span>TOTAL REGISTRATIONS</span>
+              </div>
             </div>
-            <div className="text-3xl font-bold font-headline-xl text-white mb-2">
-              {ideas.filter(i => i.status === 'pending').length}
+            <div className="text-2xl font-bold font-headline-xl text-white mb-1">
+              {registrations.length}
             </div>
-            <div className="text-xs font-code-sm text-tertiary">Awaiting Admin Scheduling</div>
+            <p className="text-[11px] text-white/50">Across all platform workshops</p>
+          </div>
+
+          <div className="soft-ui-card rounded-3xl p-5 relative overflow-hidden group border border-white/10">
+            <div className="flex justify-between items-start mb-3">
+              <div className="font-label-caps text-[10px] text-neon-purple tracking-widest uppercase font-bold flex items-center gap-1">
+                <span className="material-symbols-outlined text-xs">payments</span>
+                <span>TOTAL REVENUE (EST)</span>
+              </div>
+            </div>
+            <div className="text-2xl font-bold font-headline-xl text-white mb-1">
+              ₹{registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'approved').reduce((acc, curr) => acc + (curr.amountPaid || 99), 0)}
+            </div>
+            <p className="text-[11px] text-white/50">0% fees, directly into club account</p>
           </div>
         </section>
 
-        {/* Landing Page Feature Visibility & Controls */}
-        <div className="soft-ui-panel rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-soft-ui-lg">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-neon-purple text-lg">tune</span>
-              <h3 className="text-white font-bold text-sm">Landing Page Feature: Flagship Hackathon Matrix</h3>
-              <span className={`text-[10px] mono font-bold uppercase px-2.5 py-0.5 rounded-full ${
-                clubSettings.showHackathonMatrix
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                  : 'bg-white/5 text-white/50 border border-white/10'
-              }`}>
-                {clubSettings.showHackathonMatrix ? 'Currently Visible' : 'Currently Hidden'}
-              </span>
-            </div>
-            <p className="text-xs text-white/50 max-w-2xl leading-relaxed">
-              Toggle the dedicated Hackathon Tracks & ₹5,00,000+ Prize Pool Matrix on the public Landing Page. Keep hidden when no major hackathon is actively running.
-            </p>
-          </div>
-          <button
-            onClick={handleToggleHackathonMatrix}
-            className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
-              clubSettings.showHackathonMatrix
-                ? 'bg-emerald-500 hover:bg-emerald-400 text-black shadow-aurora'
-                : 'soft-ui-btn text-white'
-            }`}
-          >
-            <span className="material-symbols-outlined text-sm">
-              {clubSettings.showHackathonMatrix ? 'visibility' : 'visibility_off'}
-            </span>
-            <span>{clubSettings.showHackathonMatrix ? 'Hide from Landing Page' : 'Show on Landing Page'}</span>
-          </button>
-        </div>
+        {/* TAB 1: DEDICATED UPI & SCREENSHOT VERIFICATION TERMINAL */}
+        {adminNavTab === 'payments' && (
+          <section className="space-y-6 animate-fadeIn">
+            {/* Action & Filter Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 rounded-3xl bg-[#090f1e]/90 border border-amber-500/20 shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+                    <span className="material-symbols-outlined text-base">receipt_long</span>
+                  </div>
+                  <h2 className="text-white font-bold text-lg tracking-tight font-headline-lg">
+                    UPI Payment & Screenshot Review Terminal
+                  </h2>
+                </div>
+                <p className="text-xs text-white/60 max-w-xl leading-relaxed">
+                  Verify student 12-digit UPI UTR numbers against your club bank account / Google Pay statement and inspect payment screenshots to instantly issue verified entry passes.
+                </p>
+              </div>
 
-        {/* Data Grid: Upcoming Event Control & Community Proposals */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Status Filter Badges */}
+              <div className="flex flex-wrap items-center gap-2 bg-black/40 p-1.5 rounded-2xl border border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setPaymentFilterStatus('pending')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    paymentFilterStatus === 'pending'
+                      ? 'bg-amber-500 text-black shadow-[0_0_12px_rgba(245,158,11,0.4)]'
+                      : 'text-white/70 hover:text-white'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-xs">hourglass_top</span>
+                  <span>Pending ({registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'pending_review').length})</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPaymentFilterStatus('approved')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    paymentFilterStatus === 'approved'
+                      ? 'bg-emerald-500 text-black shadow-[0_0_12px_rgba(16,185,129,0.4)]'
+                      : 'text-white/70 hover:text-white'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-xs">verified</span>
+                  <span>Approved ({registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'approved').length})</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPaymentFilterStatus('rejected')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    paymentFilterStatus === 'rejected'
+                      ? 'bg-red-500 text-white shadow-[0_0_12px_rgba(239,68,68,0.4)]'
+                      : 'text-white/70 hover:text-white'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-xs">cancel</span>
+                  <span>Rejected ({registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'rejected').length})</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPaymentFilterStatus('all')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    paymentFilterStatus === 'all'
+                      ? 'bg-white/20 text-white'
+                      : 'text-white/70 hover:text-white'
+                  }`}
+                >
+                  <span>All ({registrations.filter(r => r.passType === 'paid').length})</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Search Bar for UTR / Student Name / Roll Number */}
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/40 text-lg">search</span>
+              <input
+                type="text"
+                placeholder="Search by 12-digit UTR Number, Student Name, Roll Number, or Email..."
+                value={paymentSearchQuery}
+                onChange={(e) => setPaymentSearchQuery(e.target.value)}
+                className="w-full bg-white/[0.04] border border-white/10 rounded-2xl pl-11 pr-4 py-3 text-white text-xs placeholder-white/40 focus:outline-none focus:border-amber-500/60 focus:bg-white/[0.07] transition-all"
+              />
+              {paymentSearchQuery && (
+                <button
+                  onClick={() => setPaymentSearchQuery('')}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white text-xs"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+
+            {/* List of Payments for Review */}
+            {(() => {
+              const paidList = registrations.filter(r => {
+                if (r.passType !== 'paid') return false;
+                if (paymentFilterStatus === 'pending' && r.paymentStatus !== 'pending_review') return false;
+                if (paymentFilterStatus === 'approved' && r.paymentStatus !== 'approved') return false;
+                if (paymentFilterStatus === 'rejected' && r.paymentStatus !== 'rejected') return false;
+
+                if (paymentSearchQuery.trim()) {
+                  const q = paymentSearchQuery.toLowerCase();
+                  const matchUtr = (r.utrNumber || '').toLowerCase().includes(q);
+                  const matchName = (r.userName || '').toLowerCase().includes(q);
+                  const matchRoll = (r.rollNumber || '').toLowerCase().includes(q);
+                  const matchEmail = (r.userEmail || '').toLowerCase().includes(q);
+                  const matchEvent = (r.eventTitle || '').toLowerCase().includes(q);
+                  return matchUtr || matchName || matchRoll || matchEmail || matchEvent;
+                }
+                return true;
+              });
+
+              if (paidList.length === 0) {
+                return (
+                  <div className="py-16 text-center rounded-3xl bg-white/[0.02] border border-white/10 space-y-3">
+                    <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300 flex items-center justify-center mx-auto">
+                      <span className="material-symbols-outlined text-3xl">task_alt</span>
+                    </div>
+                    <h3 className="text-white font-bold text-base">No Payments Under This Filter</h3>
+                    <p className="text-xs text-white/50 max-w-sm mx-auto">
+                      {paymentFilterStatus === 'pending'
+                        ? 'All submitted UPI payments have been reviewed! New submissions will show up here in real time.'
+                        : 'No records matching your search query.'}
+                    </p>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {paidList.map((reg) => {
+                    const isPending = reg.paymentStatus === 'pending_review';
+                    const isApproved = reg.paymentStatus === 'approved';
+                    const isRejected = reg.paymentStatus === 'rejected';
+
+                    return (
+                      <div
+                        key={reg.id}
+                        className={`rounded-3xl p-5 border flex flex-col justify-between gap-4 transition-all relative overflow-hidden ${
+                          isPending
+                            ? 'bg-gradient-to-b from-[#181a10] to-[#0c0d0a] border-amber-500/40 shadow-[0_0_25px_rgba(245,158,11,0.12)]'
+                            : isApproved
+                            ? 'bg-gradient-to-b from-[#091a14] to-[#050e0a] border-emerald-500/30'
+                            : 'bg-white/[0.02] border-white/10'
+                        }`}
+                      >
+                        {/* Status Header Strip */}
+                        <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-mono font-bold text-white/70">
+                              {reg.eventTitle || 'Event Pass'}
+                            </span>
+                          </div>
+                          
+                          <div className="flex items-center gap-1.5">
+                            {isPending && (
+                              <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-bold font-mono uppercase flex items-center gap-1 animate-pulse">
+                                <span className="material-symbols-outlined text-xs">hourglass_top</span>
+                                <span>Pending Review</span>
+                              </span>
+                            )}
+                            {isApproved && (
+                              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-bold font-mono uppercase flex items-center gap-1">
+                                <span className="material-symbols-outlined text-xs">verified</span>
+                                <span>Verified Pass Issued</span>
+                              </span>
+                            )}
+                            {isRejected && (
+                              <span className="px-2.5 py-0.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-[10px] font-bold font-mono uppercase flex items-center gap-1">
+                                <span className="material-symbols-outlined text-xs">close</span>
+                                <span>Rejected</span>
+                              </span>
+                            )}
+                            <span className="text-xs font-bold text-white font-mono px-2 py-0.5 rounded bg-white/10">
+                              ₹{reg.amountPaid || 99}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Student Details & Transaction Info */}
+                        <div className="space-y-3 text-xs">
+                          {/* Student Info */}
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h4 className="text-white font-bold text-sm tracking-tight">{reg.userName}</h4>
+                              <div className="text-white/60 text-[11px] font-mono mt-0.5">
+                                Roll ID: <strong className="text-white">{reg.rollNumber}</strong> • {reg.collegeName}
+                              </div>
+                              <div className="text-white/50 text-[11px] font-mono">
+                                Email: {reg.userEmail} • Phone: {reg.phoneNumber || 'N/A'}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 12-Digit UTR Box with Copy Button */}
+                          <div className="p-3 rounded-2xl bg-black/50 border border-white/15 flex items-center justify-between gap-3">
+                            <div>
+                              <span className="text-[10px] font-mono text-amber-300/80 uppercase block tracking-wider font-bold">
+                                12-Digit UPI Reference / UTR
+                              </span>
+                              <span className="text-sm font-mono font-extrabold text-amber-300 tracking-wider">
+                                {reg.utrNumber || '(No UTR entered)'}
+                              </span>
+                            </div>
+                            {reg.utrNumber && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(reg.utrNumber!);
+                                  alert(`Copied UTR: ${reg.utrNumber}`);
+                                }}
+                                className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 hover:text-white text-[10px] font-mono transition-colors flex items-center gap-1 cursor-pointer"
+                                title="Copy UTR Number"
+                              >
+                                <span className="material-symbols-outlined text-xs">content_copy</span>
+                                <span>Copy</span>
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Payment Screenshot Preview Card */}
+                          {reg.paymentScreenshotUrl ? (
+                            <div className="flex items-center gap-3 p-2.5 rounded-2xl bg-white/[0.03] border border-white/10">
+                              <div 
+                                onClick={() => setViewingScreenshotUrl(reg.paymentScreenshotUrl!)}
+                                className="w-14 h-14 rounded-xl overflow-hidden bg-black border border-white/20 shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+                              >
+                                <img
+                                  src={reg.paymentScreenshotUrl}
+                                  alt="Payment Screenshot"
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-[11px] font-bold text-white flex items-center gap-1">
+                                  <span className="material-symbols-outlined text-sm text-electric-cyan">image</span>
+                                  <span>Payment Screenshot Attached</span>
+                                </div>
+                                <p className="text-[10px] text-white/50 truncate">
+                                  Click to enlarge receipt for date/amount check
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setViewingScreenshotUrl(reg.paymentScreenshotUrl!)}
+                                className="px-3 py-1.5 rounded-xl bg-electric-cyan/20 border border-electric-cyan/40 text-electric-cyan hover:bg-electric-cyan hover:text-black font-bold text-[11px] transition-all shrink-0 cursor-pointer"
+                              >
+                                View Receipt
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="p-2.5 rounded-2xl bg-white/[0.02] border border-dashed border-white/15 text-[11px] text-white/40 flex items-center gap-2">
+                              <span className="material-symbols-outlined text-sm">hide_image</span>
+                              <span>No screenshot uploaded (Verified via UTR number only)</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Action Footer Buttons */}
+                        <div className="flex items-center justify-between gap-3 pt-3 border-t border-white/10">
+                          <span className="text-[10px] text-white/40 font-mono">
+                            Registered: {reg.createdAt ? new Date(reg.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : 'N/A'}
+                          </span>
+
+                          <div className="flex items-center gap-2">
+                            {isPending && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRejectPayment(reg)}
+                                  className="px-3 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 text-xs font-bold font-mono transition-all cursor-pointer"
+                                >
+                                  Reject
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleApprovePayment(reg)}
+                                  className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-black font-bold text-xs font-mono shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all flex items-center gap-1.5 cursor-pointer"
+                                >
+                                  <span className="material-symbols-outlined text-sm">verified</span>
+                                  <span>Approve Pass</span>
+                                </button>
+                              </>
+                            )}
+                            {isApproved && (
+                              <button
+                                type="button"
+                                onClick={() => handleRejectPayment(reg)}
+                                className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-red-500/20 text-white/50 hover:text-red-300 text-xs font-mono transition-all cursor-pointer"
+                                title="Revoke pass if transaction was refunded or reversed"
+                              >
+                                Revoke Pass
+                              </button>
+                            )}
+                            {isRejected && (
+                              <button
+                                type="button"
+                                onClick={() => handleApprovePayment(reg)}
+                                className="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 text-xs font-mono transition-all cursor-pointer"
+                              >
+                                Re-Approve
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+          </section>
+        )}
+
+        {/* TAB 2: UPCOMING EVENTS & COMMUNITY PROPOSALS */}
+        {(adminNavTab === 'events' || adminNavTab === 'overview') && (
+          <>
+            {/* Landing Page Feature Visibility & Controls */}
+            <div className="soft-ui-panel rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-soft-ui-lg">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-neon-purple text-lg">tune</span>
+                  <h3 className="text-white font-bold text-sm">Landing Page Feature: Flagship Hackathon Matrix</h3>
+                  <span className={`text-[10px] mono font-bold uppercase px-2.5 py-0.5 rounded-full ${
+                    clubSettings.showHackathonMatrix
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                      : 'bg-white/5 text-white/50 border border-white/10'
+                  }`}>
+                    {clubSettings.showHackathonMatrix ? 'Currently Visible' : 'Currently Hidden'}
+                  </span>
+                </div>
+                <p className="text-xs text-white/50 max-w-2xl leading-relaxed">
+                  Toggle the dedicated Hackathon Tracks & ₹5,00,000+ Prize Pool Matrix on the public Landing Page. Keep hidden when no major hackathon is actively running.
+                </p>
+              </div>
+              <button
+                onClick={handleToggleHackathonMatrix}
+                className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
+                  clubSettings.showHackathonMatrix
+                    ? 'bg-emerald-500 hover:bg-emerald-400 text-black shadow-aurora'
+                    : 'soft-ui-btn text-white'
+                }`}
+              >
+                <span className="material-symbols-outlined text-sm">
+                  {clubSettings.showHackathonMatrix ? 'visibility' : 'visibility_off'}
+                </span>
+                <span>{clubSettings.showHackathonMatrix ? 'Hide from Landing Page' : 'Show on Landing Page'}</span>
+              </button>
+            </div>
+
+            {/* Data Grid: Upcoming Event Control */}
+            <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Upcoming Event Control Panel */}
           <div className="soft-ui-card rounded-3xl flex flex-col h-[520px] overflow-hidden">
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
@@ -912,7 +1328,74 @@ export const AdminDashboard: React.FC = () => {
               )}
             </div>
           </div>
-        </section>
+          </section>
+          </>
+        )}
+
+        {/* TAB 3: IDEA HUB PROPOSALS (when selected directly) */}
+        {adminNavTab === 'ideas' && (
+          <section className="animate-fadeIn max-w-4xl mx-auto">
+            <div className="bg-surface-gray border border-outline-variant/20 rounded-3xl flex flex-col min-h-[500px] shadow-soft-ui-lg overflow-hidden">
+              <div className="p-6 border-b border-white/10 flex justify-between items-center bg-surface-gray/50 rounded-t-3xl">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-tertiary/20 border border-tertiary/40 flex items-center justify-center text-tertiary">
+                    <span className="material-symbols-outlined text-base">how_to_vote</span>
+                  </div>
+                  <h2 className="font-headline-lg text-lg text-white font-bold">
+                    Community Workshop Proposals Moderation
+                  </h2>
+                </div>
+                <span className="bg-tertiary/20 text-tertiary px-3 py-1 rounded-full font-code-sm text-xs border border-tertiary/30 font-bold">
+                  {ideas.filter(i => i.status === 'pending').length} Awaiting Approval
+                </span>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                {ideas.filter(i => i.status === 'pending').length === 0 ? (
+                  <div className="p-16 text-center text-on-surface-variant font-code-sm text-xs flex flex-col items-center justify-center">
+                    <span className="material-symbols-outlined text-5xl text-neon-purple mb-3">task_alt</span>
+                    <p className="text-white font-bold text-base">All Proposals Moderated</p>
+                    <p className="text-on-surface-variant text-xs mt-1 max-w-sm">
+                      Accepted and scheduled proposals are cleared from this panel. Newly proposed workshop topics will appear here.
+                    </p>
+                  </div>
+                ) : (
+                  ideas.filter(i => i.status === 'pending').map((idea) => (
+                    <div key={idea.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 bg-[#0c1222] border border-white/10 p-5 rounded-2xl shadow-sm">
+                      <div className="flex sm:flex-col items-center justify-center bg-white/5 rounded-xl p-3 min-w-[65px] border border-white/10 gap-1">
+                        <span className="material-symbols-outlined text-tertiary text-base">arrow_upward</span>
+                        <span className="font-code-sm font-bold text-white text-sm">{idea.upvotesCount}</span>
+                      </div>
+
+                      <div className="flex-1 space-y-1">
+                        <h4 className="font-bold text-white text-base">{idea.title}</h4>
+                        <p className="text-xs text-white/70 leading-relaxed">{idea.description}</p>
+                        <div className="mt-1 flex gap-2">
+                          <span className="text-[11px] text-white/40 font-code-sm">Proposed by: <strong className="text-white/80">{idea.authorName}</strong></span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 self-end sm:self-center">
+                        <button
+                          onClick={() => handleRejectProposal(idea.id)}
+                          className="px-4 py-2 rounded-xl bg-white/5 hover:bg-red-500/20 text-white/60 hover:text-red-300 border border-white/10 text-xs font-bold transition-all"
+                        >
+                          Reject
+                        </button>
+                        <button
+                          onClick={() => handleApproveProposal(idea)}
+                          className="px-4 py-2 rounded-xl bg-gradient-to-r from-neon-purple to-purple-600 hover:opacity-95 text-white font-bold text-xs shadow-aurora transition-all"
+                        >
+                          Approve & Schedule
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </section>
+        )}
 
         </div>
 
