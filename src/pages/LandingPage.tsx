@@ -340,10 +340,10 @@ export const LandingPage: React.FC = () => {
               
               <div className="relative z-10 space-y-2">
                 <span className="text-[10px] mono uppercase tracking-wider px-3 py-1 rounded-full bg-neon-purple/20 border border-neon-purple/40 text-neon-purple font-bold inline-block">
-                  Hands-on Engineering
+                  Upcoming Workshop
                 </span>
                 <p className="text-white font-bold text-base leading-snug">
-                  Build production containers, scale microservices, and deploy to Kubernetes clusters.
+                  Harnessing AI to design, build & transform the future.
                 </p>
               </div>
             </div>

@@ -2,61 +2,42 @@ import { EventItem, IdeaHubRequest, Opportunity, SystemAnnouncement, EventRegist
 
 export const INITIAL_EVENTS: EventItem[] = [
   {
-    id: 'evt-101',
-    title: 'Winter Web3 & DeFi Hackathon',
-    description: 'Build the next generation of decentralized applications. 48 hours to create, deploy smart contracts, and pitch to industry sponsors.',
-    category: 'hackathon',
-    status: 'open',
-    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
-    date: 'Nov 15 - 17, 2026',
-    location: 'Lab 304 & Discord',
-    registration_start_time: '2026-08-01T00:00:00.000Z',
-    registration_end_time: '2026-11-14T23:59:59.000Z',
-    is_inter_college: true,
-    min_team_size: 1,
-    max_team_size: 4,
-    max_seats: 150,
-    registered_count: 120,
-    attendance_count: 0,
-    createdAt: '2026-08-10T10:00:00.000Z'
-  },
-  {
-    id: 'evt-102',
-    title: 'Mastering WebGL Shaders & 3D Web',
-    description: 'Learn the fundamentals of GLSL shaders, Three.js canvas renders, and stunning interactive visual effects directly in modern browsers.',
+    id: 'evt-ai-civil-2026',
+    title: 'AI in Civil Engineering',
+    description: 'Harnessing AI to design, build & transform the future. Interactive workshop covering AI for Structural Analysis & Design, Smart Construction & Automation, Data-Driven Decision Making, and Sustainable & Resilient Infrastructure. Organized by Student Developers Club (SDC), Vardhaman College of Engineering. Contacts: Mani (+91 91216 48949) | Adhyumna (+91 93478 90012).',
     category: 'workshop',
     status: 'open',
-    image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
-    date: 'Oct 25, 2026 • 6:00 PM',
-    location: 'Auditorium A',
+    image: '/events/ai-in-civil-engineering.jpg',
+    date: 'September 17, 2026',
+    location: 'Vardhaman College of Engineering',
     registration_start_time: '2026-08-01T00:00:00.000Z',
-    registration_end_time: '2026-10-24T18:00:00.000Z',
-    is_inter_college: false,
-    min_team_size: 1,
-    max_team_size: 1,
-    max_seats: 60,
-    registered_count: 42,
-    attendance_count: 0,
-    createdAt: '2026-08-12T10:00:00.000Z'
-  },
-  {
-    id: 'evt-103',
-    title: 'AI Ethics & Guardrails in Production',
-    description: 'Guest lecture discussing architectural patterns for implementing safety alignment, prompt guardrails, and deterministic fallbacks in LLMs.',
-    category: 'speaker',
-    status: 'open',
-    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
-    date: 'Nov 22, 2026 • 5:00 PM',
-    location: 'Seminar Hall 2',
-    registration_start_time: '2026-08-01T00:00:00.000Z',
-    registration_end_time: '2026-11-21T23:59:59.000Z',
+    registration_end_time: '2026-09-17T09:00:00.000Z',
     is_inter_college: true,
     min_team_size: 1,
     max_team_size: 1,
-    max_seats: 100,
-    registered_count: 94,
+    max_seats: 150,
+    registered_count: 0,
     attendance_count: 0,
-    createdAt: '2026-08-14T10:00:00.000Z'
+    createdAt: '2026-08-29T05:08:25.553Z'
+  },
+  {
+    id: 'evt-github-workshop-2025',
+    title: 'Git & GitHub Hands-on Workshop',
+    description: 'Conducted by previous SDC leads to equip students with core version control fundamentals: repository management, branching workflows, pull requests, resolving merge conflicts, and contributing to open source.',
+    category: 'workshop',
+    status: 'completed',
+    image: 'https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?auto=format&fit=crop&w=800&q=80',
+    date: 'September 2025',
+    location: 'VCE Campus',
+    registration_start_time: '2025-08-01T00:00:00.000Z',
+    registration_end_time: '2025-09-15T00:00:00.000Z',
+    is_inter_college: true,
+    min_team_size: 1,
+    max_team_size: 1,
+    max_seats: 120,
+    registered_count: 120,
+    attendance_count: 110,
+    createdAt: '2025-08-01T10:00:00.000Z'
   }
 ];
 
@@ -158,49 +139,8 @@ export const INITIAL_OPPORTUNITIES: Opportunity[] = [
 ];
 
 export const INITIAL_ANNOUNCEMENTS: SystemAnnouncement[] = [
-  { id: 'ann-1', title: '🚀 Winter Web3 Hackathon registrations are now LIVE! Max team size: 4 members.', type: 'urgent', active: true },
-  { id: 'ann-2', title: '💡 Upvote your favorite workshop proposals in the Idea Hub to get them scheduled!', type: 'info', active: true }
+  { id: 'ann-1', title: '🚀 Registrations are now LIVE for "AI in Civil Engineering Workshop" on September 17th!', type: 'urgent', active: true },
+  { id: 'ann-2', title: '💡 Upvote and propose community workshops in the Idea Hub!', type: 'info', active: true }
 ];
 
-export const MOCK_USER_REGISTRATIONS: EventRegistration[] = [
-  {
-    id: 'reg-901',
-    eventId: 'evt-101',
-    eventTitle: 'Winter Web3 & DeFi Hackathon',
-    userId: 'usr-member-1',
-    userEmail: 'alex.dev@vardhaman.org',
-    userName: 'Alex Rivers',
-    collegeName: 'Vardhaman College of Engineering',
-    rollNumber: '21881A0501',
-    registrationType: 'team',
-    teamCode: 'SDC892',
-    teamName: 'CyberNova',
-    teamMembers: [
-      { name: 'Alex Rivers', email: 'alex.dev@vardhaman.org', rollNumber: '21881A0501' },
-      { name: 'Sarah Chen', email: 'sarah.ui@vardhaman.org', rollNumber: '21881A0502' }
-    ],
-    status: 'confirmed',
-    checkedIn: false,
-    createdAt: '2026-08-28T12:00:00.000Z'
-  },
-  {
-    id: 'reg-902',
-    eventId: 'evt-201',
-    eventTitle: 'Fall Build-a-thon 2025',
-    userId: 'usr-member-1',
-    userEmail: 'alex.dev@vardhaman.org',
-    userName: 'Alex Rivers',
-    collegeName: 'Vardhaman College of Engineering',
-    rollNumber: '21881A0501',
-    registrationType: 'team',
-    teamCode: 'ECO101',
-    teamName: 'EcoTrack AI',
-    teamMembers: [
-      { name: 'Alex Rivers', email: 'alex.dev@vardhaman.org', rollNumber: '21881A0501' }
-    ],
-    status: 'confirmed',
-    checkedIn: true,
-    checkedInAt: '2025-10-12T09:15:00.000Z',
-    createdAt: '2025-09-10T10:00:00.000Z'
-  }
-];
+export const MOCK_USER_REGISTRATIONS: EventRegistration[] = [];

@@ -12,6 +12,7 @@ export const EventsPage: React.FC = () => {
 
   const [events, setEvents] = useState<EventItem[]>([]);
   const [userRegistrations, setUserRegistrations] = useState<EventRegistration[]>([]);
+  const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [interCollegeOnly, setInterCollegeOnly] = useState<boolean>(role === 'guest');
 
@@ -38,9 +39,15 @@ export const EventsPage: React.FC = () => {
     };
   }, [user?.uid]);
 
-  const filteredEvents = events.filter(e => {
+  const upcomingEvents = events.filter(e => {
     if (e.status === 'completed') return false;
     if (interCollegeOnly && !e.is_inter_college) return false;
+    if (selectedCategory !== 'all' && e.category !== selectedCategory) return false;
+    return true;
+  });
+
+  const pastEvents = events.filter(e => {
+    if (e.status !== 'completed') return false;
     if (selectedCategory !== 'all' && e.category !== selectedCategory) return false;
     return true;
   });
@@ -84,8 +91,33 @@ export const EventsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Category Pills & Filters */}
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-10 pb-6 border-b border-white/10">
+      {/* Clean Navigation & Filter Bar */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-10 pb-6 border-b border-white/10">
+        {/* Main Tabs (Upcoming vs Completed Archive) */}
+        <div className="flex items-center gap-1.5 p-1 bg-[#0a0a0f] rounded-full border border-white/10">
+          <button
+            onClick={() => setActiveTab('upcoming')}
+            className={`px-6 py-2 rounded-full text-xs font-bold transition-all ${
+              activeTab === 'upcoming'
+                ? 'bg-white text-black shadow-sm'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            Upcoming ({upcomingEvents.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('past')}
+            className={`px-6 py-2 rounded-full text-xs font-bold transition-all ${
+              activeTab === 'past'
+                ? 'bg-white text-black shadow-sm'
+                : 'text-white/60 hover:text-white'
+            }`}
+          >
+            Past Workshop Archive ({pastEvents.length})
+          </button>
+        </div>
+
+        {/* Category Pills & Filters */}
         <div className="flex flex-wrap items-center gap-2">
           {['all', 'workshop', 'hackathon', 'speaker'].map((cat) => (
             <button
@@ -101,31 +133,29 @@ export const EventsPage: React.FC = () => {
             </button>
           ))}
 
-          <label className="flex items-center gap-2 soft-ui-chip px-4 py-2 rounded-full text-xs font-bold text-white/80 cursor-pointer select-none hover:border-white/30 transition-colors ml-1">
-            <input
-              type="checkbox"
-              checked={interCollegeOnly}
-              onChange={(e) => setInterCollegeOnly(e.target.checked)}
-              className="rounded bg-white/10 border-white/20 text-[#A855F7] focus:ring-0"
-            />
-            <span className="text-[11px] mono">Inter-College Only</span>
-          </label>
-        </div>
-
-        <div className="text-xs text-white/50 mono font-medium">
-          Showing <span className="text-white font-bold">{filteredEvents.length}</span> Active {filteredEvents.length === 1 ? 'Event' : 'Events'}
+          {activeTab === 'upcoming' && (
+            <label className="flex items-center gap-2 soft-ui-chip px-4 py-2 rounded-full text-xs font-bold text-white/80 cursor-pointer select-none hover:border-white/30 transition-colors ml-1">
+              <input
+                type="checkbox"
+                checked={interCollegeOnly}
+                onChange={(e) => setInterCollegeOnly(e.target.checked)}
+                className="rounded bg-white/10 border-white/20 text-[#A855F7] focus:ring-0"
+              />
+              <span className="text-[11px] mono">Inter-College Only</span>
+            </label>
+          )}
         </div>
       </div>
 
-      {/* EVENTS GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredEvents.map((evt) => {
+      {/* UPCOMING EVENTS GRID */}
+      {activeTab === 'upcoming' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {upcomingEvents.map((evt) => {
             const now = new Date().getTime();
             const start = evt.registration_start_time ? new Date(evt.registration_start_time).getTime() : 0;
             const end = evt.registration_end_time ? new Date(evt.registration_end_time).getTime() : Infinity;
             const isOpen = (start === 0 || now >= start) && (end === Infinity || now <= end);
 
-            // Check if current user is registered for this event (by ID or matching event title)
             const userReg = userRegistrations.find(r => 
               r.eventId === evt.id || 
               (r.eventTitle && evt.title && r.eventTitle.trim().toLowerCase() === evt.title.trim().toLowerCase())
@@ -137,17 +167,15 @@ export const EventsPage: React.FC = () => {
                 key={evt.id}
                 className="soft-ui-card rounded-3xl overflow-hidden flex flex-col group relative"
               >
-
-                <div className="h-48 w-full relative overflow-hidden bg-surface-container-low">
+                <div className="h-56 w-full relative overflow-hidden bg-surface-container-low">
                   <img
                     src={evt.image}
                     alt={evt.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0b1326] via-transparent to-transparent"></div>
 
                   <div className="absolute top-4 left-4 flex flex-wrap gap-2 z-10">
-                    {/* If Registered, Show Prominent Status */}
                     {isRegistered ? (
                       <span className="font-label-caps text-[10px] bg-emerald-500/25 text-emerald-300 border border-emerald-500/50 px-3 py-1 rounded-xl backdrop-blur-md uppercase font-bold flex items-center gap-1 shadow-[0_0_15px_rgba(52,211,153,0.3)]">
                         <span className="material-symbols-outlined text-xs">verified</span>
@@ -279,13 +307,68 @@ export const EventsPage: React.FC = () => {
             );
           })}
 
-          {filteredEvents.length === 0 && (
+          {upcomingEvents.length === 0 && (
             <div className="col-span-full py-16 text-center text-on-surface-variant font-code-sm bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10">
               <span className="material-symbols-outlined text-5xl mb-3 text-neon-purple">event_busy</span>
-              <p>No events matching your selected filters.</p>
+              <p>No upcoming events matching your selected filters.</p>
             </div>
           )}
-      </div>
+        </div>
+      )}
+
+      {/* COMPLETED WORKSHOP ARCHIVE GRID */}
+      {activeTab === 'past' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {pastEvents.map((evt) => (
+            <article
+              key={evt.id}
+              className="soft-ui-card rounded-3xl overflow-hidden flex flex-col group relative border border-white/10"
+            >
+              <div className="h-52 w-full relative overflow-hidden bg-surface-container-low">
+                <img
+                  src={evt.image}
+                  alt={evt.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 grayscale group-hover:grayscale-0"
+                />
+                <div className="absolute top-4 left-4 flex gap-2">
+                  <span className="font-label-caps text-[10px] bg-white/10 text-white px-3 py-1 rounded-full backdrop-blur-md uppercase tracking-wider font-bold border border-white/20">
+                    COMPLETED ARCHIVE
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-6 flex flex-col flex-grow">
+                <div className="flex items-center gap-2 text-on-surface-variant text-xs font-code-sm mb-2">
+                  <span className="material-symbols-outlined text-sm">history</span>
+                  <span>{evt.date} • {evt.attendance_count || evt.registered_count} Participants</span>
+                </div>
+
+                <h3 className="font-headline-lg text-xl font-bold text-white mb-2">
+                  {evt.title}
+                </h3>
+
+                <p className="text-on-surface-variant text-xs leading-relaxed mb-4">
+                  {evt.description}
+                </p>
+
+                <div className="mt-auto pt-4 border-t border-white/10 flex items-center justify-between text-xs font-code-sm text-white/50">
+                  <span className="flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">verified_user</span>
+                    Organized by Previous SDC Leads
+                  </span>
+                </div>
+              </div>
+            </article>
+          ))}
+
+          {pastEvents.length === 0 && (
+            <div className="col-span-full py-16 text-center text-on-surface-variant font-code-sm bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10">
+              <span className="material-symbols-outlined text-5xl mb-3 text-neon-purple">history</span>
+              <p>No archived events matching filters.</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Registration Modal */}
       {registeringEvent && (
