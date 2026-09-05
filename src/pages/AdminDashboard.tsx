@@ -685,7 +685,7 @@ export const AdminDashboard: React.FC = () => {
 
   if (role !== 'admin') {
     return (
-      <main className="flex-grow pt-32 pb-section-gap px-container-padding text-center">
+      <main className="flex-grow pt-16 pb-section-gap px-container-padding text-center">
         <h2 className="text-white text-2xl font-bold mb-4 font-headline-lg">Access Denied</h2>
         <p className="text-on-surface-variant font-code-sm">
           You need Admin privileges to access the SDC Command Center. Please sign in with an authorized Administrator account.
@@ -919,7 +919,7 @@ export const AdminDashboard: React.FC = () => {
 
         {/* Top Row: System Status & Stats Cards */}
         <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="soft-ui-card rounded-3xl p-5 relative overflow-hidden group border border-white/10">
+          <div className="soft-ui-card rounded-3xl p-4 relative overflow-hidden group border border-white/10">
             <div className="flex justify-between items-start mb-3">
               <div className="font-label-caps text-[10px] text-amber-400 tracking-widest uppercase font-bold flex items-center gap-1">
                 <span className="material-symbols-outlined text-xs">hourglass_top</span>
@@ -932,7 +932,7 @@ export const AdminDashboard: React.FC = () => {
             <p className="text-[11px] text-white/50">Unverified UPI UTR submissions</p>
           </div>
 
-          <div className="soft-ui-card rounded-3xl p-5 relative overflow-hidden group border border-white/10">
+          <div className="soft-ui-card rounded-3xl p-4 relative overflow-hidden group border border-white/10">
             <div className="flex justify-between items-start mb-3">
               <div className="font-label-caps text-[10px] text-emerald-400 tracking-widest uppercase font-bold flex items-center gap-1">
                 <span className="material-symbols-outlined text-xs">verified</span>
@@ -945,7 +945,7 @@ export const AdminDashboard: React.FC = () => {
             <p className="text-[11px] text-white/50">Verified entry QR tickets issued</p>
           </div>
 
-          <div className="soft-ui-card rounded-3xl p-5 relative overflow-hidden group border border-white/10">
+          <div className="soft-ui-card rounded-3xl p-4 relative overflow-hidden group border border-white/10">
             <div className="flex justify-between items-start mb-3">
               <div className="font-label-caps text-[10px] text-electric-cyan tracking-widest uppercase font-bold flex items-center gap-1">
                 <span className="material-symbols-outlined text-xs">group</span>
@@ -958,7 +958,7 @@ export const AdminDashboard: React.FC = () => {
             <p className="text-[11px] text-white/50">Across all platform workshops</p>
           </div>
 
-          <div className="soft-ui-card rounded-3xl p-5 relative overflow-hidden group border border-white/10">
+          <div className="soft-ui-card rounded-3xl p-4 relative overflow-hidden group border border-white/10">
             <div className="flex justify-between items-start mb-3">
               <div className="font-label-caps text-[10px] text-neon-purple tracking-widest uppercase font-bold flex items-center gap-1">
                 <span className="material-symbols-outlined text-xs">payments</span>
@@ -976,7 +976,7 @@ export const AdminDashboard: React.FC = () => {
         {adminNavTab === 'payments' && (
           <section className="space-y-6 animate-fadeIn">
             {/* Action & Filter Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6 rounded-3xl bg-[#090f1e]/90 border border-amber-500/20 shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-4 rounded-3xl bg-[#090f1e]/90 border border-amber-500/20 shadow-[0_10px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.3)]">
@@ -987,7 +987,7 @@ export const AdminDashboard: React.FC = () => {
                   </h2>
                 </div>
                 <p className="text-xs text-white/60 max-w-xl leading-relaxed">
-                  Verify student 12-digit UPI UTR numbers against your club bank account / Google Pay statement and inspect payment screenshots to instantly issue verified entry passes.
+                  Verify UTR numbers and payment screenshots to issue entry passes.
                 </p>
               </div>
 
@@ -1165,7 +1165,7 @@ export const AdminDashboard: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setSelectedPaymentIds([])}
-                        className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all"
+                        className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white transition-all cursor-pointer"
                       >
                         Deselect
                       </button>
@@ -1212,7 +1212,7 @@ export const AdminDashboard: React.FC = () => {
 
               if (paidList.length === 0) {
                 return (
-                  <div className="py-16 text-center rounded-3xl bg-white/[0.02] border border-white/10 space-y-3">
+                  <div className="py-8 text-center rounded-3xl bg-white/[0.02] border border-white/10 space-y-3">
                     <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300 flex items-center justify-center mx-auto">
                       <span className="material-symbols-outlined text-3xl">task_alt</span>
                     </div>
@@ -1445,7 +1445,7 @@ export const AdminDashboard: React.FC = () => {
                   </span>
                 </div>
                 <p className="text-xs text-white/50 max-w-2xl leading-relaxed">
-                  Toggle the dedicated Hackathon Tracks & ₹5,00,000+ Prize Pool Matrix on the public Landing Page. Keep hidden when no major hackathon is actively running.
+                  Toggle the Hackathon Prize Matrix on the Landing Page.
                 </p>
               </div>
               <button
@@ -1466,7 +1466,7 @@ export const AdminDashboard: React.FC = () => {
             {/* Data Grid: Upcoming Event Control */}
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Upcoming Event Control Panel */}
-          <div className="soft-ui-card rounded-3xl flex flex-col h-[520px] overflow-hidden">
+          <div className="soft-ui-card rounded-3xl flex flex-col min-h-[300px] max-h-[520px] overflow-hidden">
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
               <h2 className="font-headline-lg text-lg text-white font-bold flex items-center gap-2">
                 <span className="material-symbols-outlined text-electric-cyan">event_available</span>
@@ -1479,8 +1479,8 @@ export const AdminDashboard: React.FC = () => {
               {events.length === 0 ? (
                 <div className="p-12 text-center text-on-surface-variant font-code-sm text-xs flex flex-col items-center justify-center h-full">
                   <span className="material-symbols-outlined text-4xl text-outline mb-2">event_busy</span>
-                  <p className="text-white font-bold text-sm">No Events Created Yet</p>
-                  <p className="text-[11px] text-on-surface-variant mt-1">Click "+ NEW EVENT" above to publish a workshop or hackathon.</p>
+                  <p className="text-on-surface-variant text-sm">No events have been created yet.</p>
+                  <button onClick={() => setShowNewEventModal(true)} className="mt-3 px-4 py-2 rounded-xl bg-neon-purple hover:bg-neon-purple/80 text-white text-xs font-bold flex items-center gap-1.5 mx-auto cursor-pointer transition-all"><span className="material-symbols-outlined text-sm">add</span><span>Create First Event</span></button>
                 </div>
               ) : (
                 events.map((evt) => {
@@ -1506,7 +1506,7 @@ export const AdminDashboard: React.FC = () => {
                         <div className="flex gap-2">
                           <button
                             onClick={() => setViewingRegistrationsEvent(evt)}
-                            className="px-2.5 py-1 rounded-lg bg-neon-purple/20 text-xs font-code-sm text-neon-purple border border-neon-purple/40 hover:bg-neon-purple hover:text-white transition-colors flex items-center gap-1 font-bold"
+                            className="px-2.5 py-1 rounded-xl bg-neon-purple/20 text-xs font-code-sm text-neon-purple border border-neon-purple/40 hover:bg-neon-purple hover:text-white transition-colors flex items-center gap-1 font-bold cursor-pointer"
                             title="View Registered Attendees List"
                           >
                             <span className="material-symbols-outlined text-xs">group</span>
@@ -1514,7 +1514,7 @@ export const AdminDashboard: React.FC = () => {
                           </button>
                           <button
                             onClick={() => handleExportExcel(evt.id, evt.title)}
-                            className="px-2.5 py-1 rounded bg-emerald-500/15 text-xs font-code-sm text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500 hover:text-black transition-all flex items-center gap-1 font-bold cursor-pointer"
+                            className="px-2.5 py-1 rounded-xl bg-emerald-500/15 text-xs font-code-sm text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500 hover:text-black transition-all flex items-center gap-1 font-bold cursor-pointer"
                             title="Export Structured Multi-Tab Excel Workbook (.xlsx)"
                           >
                             <span className="material-symbols-outlined text-xs">table_view</span>
@@ -1522,7 +1522,7 @@ export const AdminDashboard: React.FC = () => {
                           </button>
                           <button
                             onClick={() => deleteEventService(evt.id).then(() => setEvents(events.filter(e => e.id !== evt.id)))}
-                            className="p-1 rounded bg-surface-bright text-error hover:bg-error-container/40 transition-colors"
+                            className="p-1 rounded-xl bg-surface-bright text-error hover:bg-error-container/40 transition-colors cursor-pointer"
                             title="Delete Event"
                           >
                             <span className="material-symbols-outlined text-sm">delete</span>
@@ -1550,7 +1550,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           {/* Community Proposals Moderation Panel (PENDING ONLY) */}
-          <div className="bg-surface-gray border border-outline-variant/10 rounded-2xl flex flex-col h-[520px]">
+          <div className="bg-surface-gray border border-outline-variant/10 rounded-2xl flex flex-col min-h-[300px] max-h-[520px]">
             <div className="p-6 border-b border-outline-variant/10 flex justify-between items-center bg-surface-gray/50 rounded-t-2xl">
               <h2 className="font-headline-lg text-lg text-white font-bold flex items-center gap-2">
                 <span className="material-symbols-outlined text-tertiary">how_to_vote</span>
@@ -1589,13 +1589,13 @@ export const AdminDashboard: React.FC = () => {
                     <div className="flex flex-col gap-1.5">
                       <button
                         onClick={() => handleApproveProposal(idea)}
-                        className="bg-neon-purple/20 hover:bg-neon-purple text-neon-purple hover:text-white border border-neon-purple/40 px-3 py-1 rounded font-label-caps text-[10px] transition-all font-bold"
+                        className="bg-neon-purple/20 hover:bg-neon-purple text-neon-purple hover:text-white border border-neon-purple/40 px-3 py-1 rounded-xl font-label-caps text-[10px] transition-all font-bold cursor-pointer"
                       >
                         APPROVE
                       </button>
                       <button
                         onClick={() => handleRejectProposal(idea.id)}
-                        className="bg-surface-bright hover:bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded font-label-caps text-[10px] transition-all"
+                        className="bg-surface-bright hover:bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-xl font-label-caps text-[10px] transition-all cursor-pointer"
                       >
                         REJECT
                       </button>
@@ -1612,7 +1612,7 @@ export const AdminDashboard: React.FC = () => {
         {/* TAB 3: IDEA HUB PROPOSALS (when selected directly) */}
         {adminNavTab === 'ideas' && (
           <section className="animate-fadeIn max-w-4xl mx-auto">
-            <div className="bg-surface-gray border border-outline-variant/20 rounded-3xl flex flex-col min-h-[500px] shadow-soft-ui-lg overflow-hidden">
+            <div className="bg-surface-gray border border-outline-variant/20 rounded-3xl flex flex-col min-h-[300px] shadow-soft-ui-lg overflow-hidden">
               <div className="p-6 border-b border-white/10 flex justify-between items-center bg-surface-gray/50 rounded-t-3xl">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-xl bg-tertiary/20 border border-tertiary/40 flex items-center justify-center text-tertiary">
@@ -1629,7 +1629,7 @@ export const AdminDashboard: React.FC = () => {
 
               <div className="flex-1 overflow-y-auto p-6 space-y-4">
                 {ideas.filter(i => i.status === 'pending').length === 0 ? (
-                  <div className="p-16 text-center text-on-surface-variant font-code-sm text-xs flex flex-col items-center justify-center">
+                  <div className="py-8 text-center text-on-surface-variant font-code-sm text-xs flex flex-col items-center justify-center">
                     <span className="material-symbols-outlined text-5xl text-neon-purple mb-3">task_alt</span>
                     <p className="text-white font-bold text-base">All Proposals Moderated</p>
                     <p className="text-on-surface-variant text-xs mt-1 max-w-sm">
@@ -1655,13 +1655,13 @@ export const AdminDashboard: React.FC = () => {
                       <div className="flex items-center gap-2 self-end sm:self-center">
                         <button
                           onClick={() => handleRejectProposal(idea.id)}
-                          className="px-4 py-2 rounded-xl bg-white/5 hover:bg-red-500/20 text-white/60 hover:text-red-300 border border-white/10 text-xs font-bold transition-all"
+                          className="px-4 py-2 rounded-xl bg-white/5 hover:bg-red-500/20 text-white/60 hover:text-red-300 border border-white/10 text-xs font-bold transition-all cursor-pointer"
                         >
                           Reject
                         </button>
                         <button
                           onClick={() => handleApproveProposal(idea)}
-                          className="px-4 py-2 rounded-xl bg-gradient-to-r from-neon-purple to-purple-600 hover:opacity-95 text-white font-bold text-xs shadow-aurora transition-all"
+                          className="px-4 py-2 rounded-xl bg-gradient-to-r from-neon-purple to-purple-600 hover:opacity-95 text-white font-bold text-xs shadow-aurora transition-all cursor-pointer"
                         >
                           Approve & Schedule
                         </button>
@@ -1685,7 +1685,7 @@ export const AdminDashboard: React.FC = () => {
                 <span className="material-symbols-outlined text-neon-purple">add_circle</span>
                 Create New Upcoming Event
               </h3>
-              <button onClick={() => setShowNewEventModal(false)} className="text-on-surface-variant hover:text-white">
+              <button onClick={() => setShowNewEventModal(false)} className="text-on-surface-variant hover:text-white cursor-pointer">
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
@@ -1702,7 +1702,7 @@ export const AdminDashboard: React.FC = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-on-surface-variant font-code-sm mb-1">Category</label>
                   <select
@@ -1815,7 +1815,7 @@ export const AdminDashboard: React.FC = () => {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-on-surface-variant font-code-sm mb-1">Max Team Size</label>
                   <input
@@ -1839,7 +1839,7 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-on-surface-variant font-code-sm mb-1">Registration Start Time</label>
                   <input
@@ -1870,7 +1870,7 @@ export const AdminDashboard: React.FC = () => {
                   className="rounded bg-surface-container text-neon-purple focus:ring-0"
                 />
                 <label htmlFor="interCollege" className="text-on-surface font-code-sm text-xs">
-                  Allow External College Guest Registrations (`is_inter_college`)
+                  Allow External College Guest Registrations
                 </label>
               </div>
 
@@ -1878,13 +1878,13 @@ export const AdminDashboard: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowNewEventModal(false)}
-                  className="px-4 py-2 rounded font-code-sm text-on-surface-variant"
+                  className="px-4 py-2 rounded-xl font-code-sm text-on-surface-variant cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-neon-purple text-white font-label-caps uppercase font-bold hover:bg-inverse-primary"
+                  className="px-6 py-2.5 rounded-xl bg-neon-purple text-white font-label-caps uppercase font-bold hover:bg-inverse-primary cursor-pointer"
                 >
                   Publish Event
                 </button>
@@ -1903,7 +1903,7 @@ export const AdminDashboard: React.FC = () => {
                 <span className="material-symbols-outlined text-electric-cyan">hub</span>
                 Publish Opportunity to Campus Radar
               </h3>
-              <button onClick={() => setShowNewOppModal(false)} className="text-on-surface-variant hover:text-white">
+              <button onClick={() => setShowNewOppModal(false)} className="text-on-surface-variant hover:text-white cursor-pointer">
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
@@ -1933,7 +1933,7 @@ export const AdminDashboard: React.FC = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-on-surface-variant font-code-sm mb-1">Category</label>
                   <select
@@ -1982,10 +1982,10 @@ export const AdminDashboard: React.FC = () => {
               </div>
 
               <div className="pt-2 flex justify-end gap-3 border-t border-outline-variant/20">
-                <button type="button" onClick={() => setShowNewOppModal(false)} className="px-4 py-2 rounded font-code-sm text-on-surface-variant">
+                <button type="button" onClick={() => setShowNewOppModal(false)} className="px-4 py-2 rounded-xl font-code-sm text-on-surface-variant cursor-pointer">
                   Cancel
                 </button>
-                <button type="submit" className="px-6 py-2.5 rounded-xl bg-electric-cyan text-white font-label-caps uppercase font-bold">
+                <button type="submit" className="px-6 py-2.5 rounded-xl bg-electric-cyan text-white font-label-caps uppercase font-bold cursor-pointer">
                   Publish Radar
                 </button>
               </div>
@@ -2030,7 +2030,7 @@ export const AdminDashboard: React.FC = () => {
 
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-deep-black/85 backdrop-blur-xl animate-fadeIn">
-            <div className="bg-[#0b1326] border border-white/20 rounded-3xl max-w-4xl w-full p-6 sm:p-8 relative shadow-2xl space-y-5 max-h-[92vh] flex flex-col">
+            <div className="bg-[#0b1326] border border-white/20 rounded-3xl max-w-4xl w-full p-4 sm:p-5 relative shadow-2xl space-y-3 max-h-[90vh] flex flex-col">
               
               {/* Header */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/10 pb-4">
@@ -2052,7 +2052,7 @@ export const AdminDashboard: React.FC = () => {
                   {/* Download HOD Report (.txt) */}
                   <button
                     onClick={() => handleDownloadHODReport(viewingRegistrationsEvent)}
-                    className="px-3.5 py-2 rounded-xl bg-success-glow/20 text-success-glow border border-success-glow/40 hover:bg-success-glow hover:text-white transition-all text-xs font-code-sm font-bold flex items-center gap-1.5 shadow-[0_0_12px_rgba(34,197,94,0.3)]"
+                    className="px-3.5 py-2 rounded-xl bg-success-glow/20 text-success-glow border border-success-glow/40 hover:bg-success-glow hover:text-white transition-all text-xs font-code-sm font-bold flex items-center gap-1.5 shadow-[0_0_12px_rgba(34,197,94,0.3)] cursor-pointer"
                     title="Download structured official attendance text file for HOD"
                   >
                     <span className="material-symbols-outlined text-sm">description</span>
@@ -2071,7 +2071,7 @@ export const AdminDashboard: React.FC = () => {
 
                   <button
                     onClick={() => setViewingRegistrationsEvent(null)}
-                    className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-on-surface-variant hover:text-white flex items-center justify-center border border-white/10"
+                    className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-on-surface-variant hover:text-white flex items-center justify-center border border-white/10 cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-sm">close</span>
                   </button>
@@ -2107,7 +2107,7 @@ export const AdminDashboard: React.FC = () => {
                 <span className="text-on-surface-variant mr-1 text-[11px]">Filter:</span>
                 <button
                   onClick={() => setRosterFilter('all')}
-                  className={`px-2.5 py-1 rounded-xl transition-colors ${
+                  className={`px-2.5 py-1 rounded-xl transition-colors cursor-pointer ${
                     rosterFilter === 'all' ? 'bg-white/20 text-white font-bold' : 'text-on-surface-variant hover:text-white'
                   }`}
                 >
@@ -2116,7 +2116,7 @@ export const AdminDashboard: React.FC = () => {
                 {pendingPaidCount > 0 && (
                   <button
                     onClick={() => setRosterFilter('paid_pending')}
-                    className={`px-2.5 py-1 rounded-xl transition-colors flex items-center gap-1 ${
+                    className={`px-2.5 py-1 rounded-xl transition-colors flex items-center gap-1 cursor-pointer ${
                       rosterFilter === 'paid_pending'
                         ? 'bg-amber-500/30 text-amber-300 font-bold border border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.3)]'
                         : 'bg-amber-500/10 text-amber-300/80 hover:text-amber-200 border border-amber-500/20'
@@ -2128,7 +2128,7 @@ export const AdminDashboard: React.FC = () => {
                 )}
                 <button
                   onClick={() => setRosterFilter('paid_approved')}
-                  className={`px-2.5 py-1 rounded-xl transition-colors ${
+                  className={`px-2.5 py-1 rounded-xl transition-colors cursor-pointer ${
                     rosterFilter === 'paid_approved' ? 'bg-emerald-500/25 text-emerald-300 font-bold border border-emerald-500/40' : 'text-on-surface-variant hover:text-white'
                   }`}
                 >
@@ -2136,7 +2136,7 @@ export const AdminDashboard: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setRosterFilter('free')}
-                  className={`px-2.5 py-1 rounded-xl transition-colors ${
+                  className={`px-2.5 py-1 rounded-xl transition-colors cursor-pointer ${
                     rosterFilter === 'free' ? 'bg-white/20 text-white font-bold border border-white/30' : 'text-on-surface-variant hover:text-white'
                   }`}
                 >
@@ -2144,7 +2144,7 @@ export const AdminDashboard: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setRosterFilter('present')}
-                  className={`px-2.5 py-1 rounded-xl transition-colors ${
+                  className={`px-2.5 py-1 rounded-xl transition-colors cursor-pointer ${
                     rosterFilter === 'present' ? 'bg-success-glow/25 text-success-glow font-bold border border-success-glow/40' : 'text-on-surface-variant hover:text-white'
                   }`}
                 >
@@ -2152,7 +2152,7 @@ export const AdminDashboard: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setRosterFilter('absent')}
-                  className={`px-2.5 py-1 rounded-xl transition-colors ${
+                  className={`px-2.5 py-1 rounded-xl transition-colors cursor-pointer ${
                     rosterFilter === 'absent' ? 'bg-error-container/30 text-error font-bold border border-error/40' : 'text-on-surface-variant hover:text-white'
                   }`}
                 >
@@ -2160,7 +2160,7 @@ export const AdminDashboard: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setRosterFilter('vardhaman')}
-                  className={`px-2.5 py-1 rounded-xl transition-colors ${
+                  className={`px-2.5 py-1 rounded-xl transition-colors cursor-pointer ${
                     rosterFilter === 'vardhaman' ? 'bg-neon-purple/25 text-neon-purple font-bold border border-neon-purple/40' : 'text-on-surface-variant hover:text-white'
                   }`}
                 >
@@ -2168,7 +2168,7 @@ export const AdminDashboard: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setRosterFilter('other')}
-                  className={`px-2.5 py-1 rounded-xl transition-colors ${
+                  className={`px-2.5 py-1 rounded-xl transition-colors cursor-pointer ${
                     rosterFilter === 'other' ? 'bg-electric-cyan/25 text-electric-cyan font-bold border border-electric-cyan/40' : 'text-on-surface-variant hover:text-white'
                   }`}
                 >
@@ -2179,7 +2179,7 @@ export const AdminDashboard: React.FC = () => {
               {/* Attendee List Table */}
               <div className="flex-1 overflow-y-auto space-y-3 pr-1">
                 {filteredRegs.length === 0 ? (
-                  <div className="py-12 text-center text-on-surface-variant font-code-sm text-xs bg-white/[0.02] rounded-2xl border border-white/10">
+                  <div className="py-6 text-center text-on-surface-variant font-code-sm text-xs bg-white/[0.02] rounded-2xl border border-white/10">
                     <span className="material-symbols-outlined text-4xl text-neon-purple mb-2">person_search</span>
                     <p className="text-white font-bold text-sm">No Attendees Match This Filter</p>
                     <p className="text-[11px] text-on-surface-variant mt-1">
@@ -2295,7 +2295,7 @@ export const AdminDashboard: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => handleRejectPayment(reg)}
-                              className="px-2.5 py-1.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 hover:bg-red-500 hover:text-white font-bold text-xs font-code-sm transition-all"
+                              className="px-2.5 py-1.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 hover:bg-red-500 hover:text-white font-bold text-xs font-code-sm transition-all cursor-pointer"
                               title="Reject invalid transaction UTR"
                             >
                               Reject
@@ -2306,7 +2306,7 @@ export const AdminDashboard: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => handleToggleCheckIn(reg)}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-code-sm font-bold border transition-colors flex items-center gap-1 ${
+                          className={`px-3 py-1.5 rounded-xl text-xs font-code-sm font-bold border transition-colors flex items-center gap-1 cursor-pointer ${
                             reg.checkedIn
                               ? 'bg-white/5 border-white/15 text-on-surface-variant hover:text-error hover:border-error/40'
                               : 'bg-success-glow/20 border-success-glow/40 text-success-glow hover:bg-success-glow hover:text-white'
@@ -2339,7 +2339,7 @@ export const AdminDashboard: React.FC = () => {
               </h4>
               <button
                 onClick={() => setViewingScreenshotUrl(null)}
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
               >
                 <span className="material-symbols-outlined text-sm">close</span>
               </button>
@@ -2351,14 +2351,7 @@ export const AdminDashboard: React.FC = () => {
                 className="max-w-full max-h-[65vh] object-contain rounded-lg"
               />
             </div>
-            <div className="flex justify-end">
-              <button
-                onClick={() => setViewingScreenshotUrl(null)}
-                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold"
-              >
-                Close
-              </button>
-            </div>
+
           </div>
         </div>
       )}

@@ -30,9 +30,9 @@ export const OpportunitiesPage: React.FC = () => {
   };
 
   return (
-    <main className="flex-grow z-10 w-full max-w-7xl mx-auto px-container-padding py-24 flex flex-col gap-12 relative">
+    <main className="flex-grow z-10 w-full max-w-7xl mx-auto px-container-padding pt-[68px] pb-12 flex flex-col gap-12 relative">
       {/* Header Section */}
-      <header className="relative p-8 md:p-10 rounded-3xl backdrop-blur-2xl bg-[#090d1a]/85 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden">
+      <header className="relative p-6 md:p-8 rounded-3xl backdrop-blur-2xl bg-[#090d1a]/85 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-28 bg-gradient-to-b from-white/[0.08] to-transparent pointer-events-none rounded-t-3xl"></div>
 
         <div className="relative z-10 max-w-3xl">
@@ -69,7 +69,7 @@ export const OpportunitiesPage: React.FC = () => {
       {/* Soft-UI Grid */}
       {/* Soft-UI Grid */}
       {filteredOpps.length === 0 ? (
-        <div className="py-20 text-center rounded-3xl bg-white/[0.02] border border-white/10 space-y-4 max-w-2xl mx-auto w-full">
+        <div className="py-10 text-center rounded-3xl bg-white/[0.02] border border-white/10 space-y-4 max-w-2xl mx-auto w-full">
           <div className="w-16 h-16 rounded-2xl bg-electric-cyan/10 border border-electric-cyan/20 text-electric-cyan flex items-center justify-center mx-auto">
             <span className="material-symbols-outlined text-3xl">radar</span>
           </div>

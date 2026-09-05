@@ -59,9 +59,9 @@ export const EventsPage: React.FC = () => {
   };
 
   return (
-    <main className="flex-grow pt-24 pb-section-gap px-container-padding w-full max-w-7xl mx-auto flex flex-col relative z-10">
+    <main className="flex-grow pt-[68px] pb-section-gap px-container-padding w-full max-w-7xl mx-auto flex flex-col relative z-10">
       {/* Header Section */}
-      <header className="relative mb-10 p-8 md:p-10 rounded-3xl backdrop-blur-2xl bg-[#090d1a]/85 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden">
+      <header className="relative mb-6 p-8 md:p-10 rounded-3xl backdrop-blur-2xl bg-[#090d1a]/85 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-28 bg-gradient-to-b from-white/[0.08] to-transparent pointer-events-none rounded-t-3xl"></div>
 
         <div className="relative z-10">
@@ -92,7 +92,7 @@ export const EventsPage: React.FC = () => {
       )}
 
       {/* Clean Navigation & Filter Bar */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-10 pb-6 border-b border-white/10">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6 pb-4 border-b border-white/10">
         {/* Main Tabs (Upcoming vs Completed Archive) */}
         <div className="flex items-center gap-1.5 p-1 bg-[#0a0a0f] rounded-full border border-white/10">
           <button
@@ -319,7 +319,7 @@ export const EventsPage: React.FC = () => {
           })}
 
           {upcomingEvents.length === 0 && (
-            <div className="col-span-full py-16 text-center text-on-surface-variant font-code-sm bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10">
+            <div className="col-span-full py-8 text-center text-on-surface-variant font-code-sm bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10">
               <span className="material-symbols-outlined text-5xl mb-3 text-neon-purple">event_busy</span>
               <p>No upcoming events matching your selected filters.</p>
             </div>
@@ -373,7 +373,7 @@ export const EventsPage: React.FC = () => {
           ))}
 
           {pastEvents.length === 0 && (
-            <div className="col-span-full py-16 text-center text-on-surface-variant font-code-sm bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10">
+            <div className="col-span-full py-8 text-center text-on-surface-variant font-code-sm bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10">
               <span className="material-symbols-outlined text-5xl mb-3 text-neon-purple">history</span>
               <p>No archived events matching filters.</p>
             </div>

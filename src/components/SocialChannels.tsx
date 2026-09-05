@@ -2,14 +2,14 @@ import React from 'react';
 
 export const SocialChannels: React.FC = () => {
   return (
-    <section className="relative z-10 py-16 px-container-padding max-w-7xl mx-auto">
+    <section className="relative z-10 py-10 px-container-padding max-w-7xl mx-auto">
       {/* Soft-UI & Glass Section Container */}
       <div className="soft-ui-panel rounded-3xl p-6 sm:p-10 shadow-soft-ui-lg relative overflow-hidden">
         {/* Top Specular Sheen */}
         <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white/[0.08] to-transparent pointer-events-none rounded-t-3xl"></div>
 
         {/* Header Title */}
-        <div className="text-center mb-10 relative z-10">
+        <div className="text-center mb-6 relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs font-code-sm text-electric-cyan mb-2 shadow-soft-ui-chip">
             <span className="w-1.5 h-1.5 rounded-full bg-electric-cyan animate-ping"></span>
             <span>COMMUNITY_NETWORKS // DIRECT_CHANNELS</span>
@@ -30,7 +30,7 @@ export const SocialChannels: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Follow Student Developer Club VCE on LinkedIn"
-            className="soft-ui-card rounded-2xl p-8 flex flex-col items-center text-center group cursor-pointer"
+            className="soft-ui-card rounded-2xl p-6 flex flex-col items-center text-center group cursor-pointer"
           >
             <div className="w-14 h-14 rounded-2xl bg-electric-cyan/10 border border-electric-cyan/30 flex items-center justify-center text-[#67d7f0] mb-4 group-hover:scale-110 group-hover:bg-electric-cyan/20 transition-all duration-300 shadow-soft-ui">
               <svg className="w-7 h-7 fill-current" viewBox="0 0 24 24">
@@ -55,7 +55,7 @@ export const SocialChannels: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Follow Student Developer Club VCE on Instagram"
-            className="soft-ui-card rounded-2xl p-8 flex flex-col items-center text-center group cursor-pointer"
+            className="soft-ui-card rounded-2xl p-6 flex flex-col items-center text-center group cursor-pointer"
           >
             <div className="w-14 h-14 rounded-2xl bg-pink-500/10 border border-pink-500/30 flex items-center justify-center text-[#d79dfc] mb-4 group-hover:scale-110 group-hover:bg-pink-500/20 transition-all duration-300 shadow-soft-ui">
               <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -82,7 +82,7 @@ export const SocialChannels: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Join Student Developer Club VCE on Discord"
-            className="soft-ui-card rounded-2xl p-8 flex flex-col items-center text-center group cursor-pointer"
+            className="soft-ui-card rounded-2xl p-6 flex flex-col items-center text-center group cursor-pointer"
           >
             <div className="w-14 h-14 rounded-2xl bg-neon-purple/10 border border-neon-purple/30 flex items-center justify-center text-[#9c8eff] mb-4 group-hover:scale-110 group-hover:bg-neon-purple/20 transition-all duration-300 shadow-soft-ui">
               <svg className="w-7 h-7 fill-current" viewBox="0 0 24 24">

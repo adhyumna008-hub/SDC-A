@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="relative z-20 mt-auto border-t border-white/10 backdrop-blur-2xl bg-[#060812]/95 pt-16 sm:pt-20 pb-12 px-4 sm:px-8 md:px-12">
+    <footer className="relative z-20 mt-auto border-t border-white/10 backdrop-blur-2xl bg-[#060812]/95 pt-10 sm:pt-12 pb-8 px-4 sm:px-8 md:px-12">
       <div className="max-w-7xl mx-auto">
         {/* Massive Editorial Outline Headline */}
-        <div className="mb-14 sm:mb-16">
+        <div className="mb-8 sm:mb-10">
           <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-neon-purple mono block mb-3">
             University Developer Ecosystem
           </span>
@@ -17,7 +17,7 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Multi-column navigation & community links */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 pb-16 border-b border-white/10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 pb-10 border-b border-white/10">
           {/* Column 1: Brand & Mission */}
           <div className="space-y-4 md:col-span-1">
             <div className="flex items-center gap-3">

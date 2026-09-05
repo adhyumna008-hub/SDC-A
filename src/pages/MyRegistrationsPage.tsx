@@ -22,7 +22,7 @@ export const MyRegistrationsPage: React.FC = () => {
 
   if (!user) {
     return (
-      <main className="flex-grow pt-32 pb-section-gap px-container-padding text-center">
+      <main className="flex-grow pt-20 pb-section-gap px-container-padding text-center">
         <div className="max-w-md mx-auto backdrop-blur-2xl bg-white/[0.04] border border-white/15 p-8 rounded-3xl shadow-xl">
           <span className="material-symbols-outlined text-4xl text-neon-purple mb-3">lock</span>
           <h2 className="text-white text-2xl font-bold mb-2 font-headline-lg">Access Restricted</h2>
@@ -35,9 +35,9 @@ export const MyRegistrationsPage: React.FC = () => {
   }
 
   return (
-    <main className="flex-grow pt-24 pb-section-gap px-container-padding w-full max-w-7xl mx-auto flex flex-col relative z-10">
+    <main className="flex-grow pt-[68px] pb-section-gap px-container-padding w-full max-w-7xl mx-auto flex flex-col relative z-10">
       {/* Header Banner */}
-      <header className="relative mb-10 p-8 md:p-10 rounded-3xl backdrop-blur-2xl bg-[#090d1a]/85 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden">
+      <header className="relative mb-6 p-6 md:p-8 rounded-3xl backdrop-blur-2xl bg-[#090d1a]/85 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-28 bg-gradient-to-b from-white/[0.08] to-transparent pointer-events-none rounded-t-3xl"></div>
 
         <div className="relative z-10">
@@ -55,7 +55,7 @@ export const MyRegistrationsPage: React.FC = () => {
       </header>
 
       {registrations.length === 0 ? (
-        <div className="backdrop-blur-2xl bg-white/[0.04] border border-white/15 rounded-3xl p-12 text-center text-on-surface-variant font-code-sm shadow-xl max-w-2xl mx-auto">
+        <div className="backdrop-blur-2xl bg-white/[0.04] border border-white/15 rounded-3xl p-8 text-center text-on-surface-variant font-code-sm shadow-xl max-w-2xl mx-auto">
           <span className="material-symbols-outlined text-6xl text-neon-purple/70 mb-3">confirmation_number</span>
           <p className="text-lg text-white font-bold mb-1">No Active Event Registrations</p>
           <p className="text-sm">Head over to the Events Terminal to register for upcoming workshops or hackathons!</p>

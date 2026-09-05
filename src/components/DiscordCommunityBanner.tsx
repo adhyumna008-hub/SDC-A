@@ -2,8 +2,8 @@ import React from 'react';
 
 export const DiscordCommunityBanner: React.FC = () => {
   return (
-    <section className="relative z-10 py-16 px-4 sm:px-8 md:px-12 max-w-7xl mx-auto w-full mb-16">
-      <div className="relative rounded-3xl p-10 sm:p-16 soft-ui-panel border border-white/10 shadow-soft-ui-lg overflow-hidden text-center">
+    <section className="relative z-10 py-10 px-4 sm:px-8 md:px-12 max-w-7xl mx-auto w-full mb-8">
+      <div className="relative rounded-3xl p-8 sm:p-10 soft-ui-panel border border-white/10 shadow-soft-ui-lg overflow-hidden text-center">
         {/* Ambient Glows */}
         <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[550px] h-[300px] bg-gradient-to-r from-neon-purple/30 to-electric-cyan/20 rounded-full blur-[120px] pointer-events-none -z-10 animate-pulse"></div>
 

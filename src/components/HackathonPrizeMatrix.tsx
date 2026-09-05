@@ -85,11 +85,11 @@ export const HackathonPrizeMatrix: React.FC = () => {
   const [selectedTrack, setSelectedTrack] = useState<string | null>(null);
 
   return (
-    <section className="relative z-10 py-20 px-4 sm:px-8 md:px-12 max-w-7xl mx-auto w-full">
+    <section className="relative z-10 py-12 px-4 sm:px-8 md:px-12 max-w-7xl mx-auto w-full">
       {/* Container with Soft-UI & Glassmorphism */}
-      <div className="soft-ui-panel rounded-3xl p-8 sm:p-12 shadow-soft-ui-lg">
+      <div className="soft-ui-panel rounded-3xl p-6 sm:p-8 shadow-soft-ui-lg">
         {/* Header section */}
-        <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/10">
+        <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-white/10">
           <div>
             <span className="text-[10px] uppercase tracking-[0.25em] font-bold text-neon-purple mono block mb-2">
               Grand Finale // Cohort 2026
