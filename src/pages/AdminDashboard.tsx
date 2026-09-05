@@ -695,15 +695,15 @@ export const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <main className="flex-1 flex flex-col min-h-screen bg-background relative pt-20">
+    <main className="flex-1 flex flex-col min-h-screen bg-background relative pt-[60px]">
       {/* Header with 3-Line Menu Button */}
-      <header className="flex items-center justify-between px-container-padding py-3 border-b border-outline-variant/10 bg-surface/80 backdrop-blur-md z-20 sticky top-16">
+      <header className="flex items-center justify-between px-container-padding py-2 border-b border-outline-variant/10 bg-surface/80 backdrop-blur-md z-20 sticky top-[60px]">
         <div className="flex items-center gap-3">
           {/* 3-Line Menu Button (Admin Navigation Drawer) */}
           <button
             type="button"
             onClick={() => setIsDrawerOpen(true)}
-            className="w-10 h-10 rounded-2xl bg-white/[0.06] hover:bg-neon-purple/20 border border-white/15 hover:border-neon-purple/50 text-white flex items-center justify-center transition-all shadow-soft-ui cursor-pointer group"
+            className="w-9 h-9 rounded-xl bg-white/[0.06] hover:bg-neon-purple/20 border border-white/15 hover:border-neon-purple/50 text-white flex items-center justify-center transition-all cursor-pointer group"
             title="Open Admin Navigation Menu"
           >
             <span className="material-symbols-outlined text-xl text-white/80 group-hover:text-neon-purple group-hover:scale-110 transition-transform">
@@ -915,7 +915,7 @@ export const AdminDashboard: React.FC = () => {
       )}
 
       {/* Main Content Area */}
-      <div className="p-container-padding space-y-8 max-w-7xl mx-auto w-full">
+      <div className="px-container-padding pt-4 pb-8 space-y-4 max-w-7xl mx-auto w-full">
 
         {/* Top Row: System Status & Stats Cards */}
         <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
