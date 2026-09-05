@@ -351,56 +351,58 @@ export const LandingPage: React.FC = () => {
         </section>
       )}
 
-      {/* Opportunity Radar Highlights */}
-      <section className="relative z-10 py-12 px-container-padding max-w-7xl mx-auto mb-16">
-        <div className="flex justify-between items-end mb-10">
-          <div>
-            <span className="font-label-caps text-xs text-electric-cyan tracking-widest uppercase block mb-1">External Radar</span>
-            <h2 className="font-headline-lg text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
-              <span className="material-symbols-outlined text-electric-cyan">hub</span>
-              <span>Curated Opportunities</span>
-            </h2>
-          </div>
-          <Link to="/opportunities" className="text-neon-purple hover:text-white font-code-sm text-xs flex items-center gap-1 transition-colors">
-            View All Opportunities <span className="material-symbols-outlined text-sm">chevron_right</span>
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {opportunities.map((opp) => (
-            <div 
-              key={opp.id} 
-              className="soft-ui-card rounded-3xl p-6 flex flex-col justify-between h-full group relative overflow-hidden"
-            >
-              <div className="relative z-10">
-                <div className="flex justify-between items-start mb-4">
-                  <span className="bg-white/[0.06] text-electric-cyan px-3 py-1 rounded-xl font-label-caps text-[10px] tracking-wider border border-white/15 uppercase font-bold">
-                    {opp.category}
-                  </span>
-                  <span className="material-symbols-outlined text-on-surface-variant group-hover:text-neon-purple transition-colors">open_in_new</span>
-                </div>
-                <h3 className="text-white font-bold text-lg mb-1.5 group-hover:text-neon-purple transition-colors line-clamp-1">
-                  {opp.title}
-                </h3>
-                <p className="text-on-surface-variant font-code-sm text-xs mb-3">{opp.organization}</p>
-                <p className="text-on-surface-variant text-xs leading-relaxed line-clamp-2 mb-4">{opp.description}</p>
-              </div>
-
-              <a
-                href={opp.externalUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full text-center soft-ui-btn text-white py-2.5 rounded-full font-label-caps text-xs transition-all mt-4 block uppercase font-bold relative z-10 shadow-sm"
-              >
-                Apply External
-              </a>
+      {/* Opportunity Radar Highlights (Only displayed if admin publishes real opportunities) */}
+      {opportunities.length > 0 && (
+        <section className="relative z-10 py-12 px-container-padding max-w-7xl mx-auto mb-16">
+          <div className="flex justify-between items-end mb-10">
+            <div>
+              <span className="font-label-caps text-xs text-electric-cyan tracking-widest uppercase block mb-1">External Radar</span>
+              <h2 className="font-headline-lg text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
+                <span className="material-symbols-outlined text-electric-cyan">hub</span>
+                <span>Curated Opportunities</span>
+              </h2>
             </div>
-          ))}
-        </div>
-      </section>
+            <Link to="/opportunities" className="text-neon-purple hover:text-white font-code-sm text-xs flex items-center gap-1 transition-colors">
+              View All Opportunities <span className="material-symbols-outlined text-sm">chevron_right</span>
+            </Link>
+          </div>
 
-      {/* Flagship Hackathon Tracks & Prize Pool Matrix (Toggled by Admin, Hidden by default) */}
-      {clubSettings.showHackathonMatrix && <HackathonPrizeMatrix />}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {opportunities.map((opp) => (
+              <div 
+                key={opp.id} 
+                className="soft-ui-card rounded-3xl p-6 flex flex-col justify-between h-full group relative overflow-hidden"
+              >
+                <div className="relative z-10">
+                  <div className="flex justify-between items-start mb-4">
+                    <span className="bg-white/[0.06] text-electric-cyan px-3 py-1 rounded-xl font-label-caps text-[10px] tracking-wider border border-white/15 uppercase font-bold">
+                      {opp.category}
+                    </span>
+                    <span className="material-symbols-outlined text-on-surface-variant group-hover:text-neon-purple transition-colors">open_in_new</span>
+                  </div>
+                  <h3 className="text-white font-bold text-lg mb-1.5 group-hover:text-neon-purple transition-colors line-clamp-1">
+                    {opp.title}
+                  </h3>
+                  <p className="text-on-surface-variant font-code-sm text-xs mb-3">{opp.organization}</p>
+                  <p className="text-on-surface-variant text-xs leading-relaxed line-clamp-2 mb-4">{opp.description}</p>
+                </div>
+
+                <a
+                  href={opp.externalUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full text-center soft-ui-btn text-white py-2.5 rounded-full font-label-caps text-xs transition-all mt-4 block uppercase font-bold relative z-10 shadow-sm"
+                >
+                  Apply External
+                </a>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Flagship Hackathon Tracks & Prize Pool Matrix (Completely hidden unless an active grand hackathon is running) */}
+      {clubSettings.showHackathonMatrix && false && <HackathonPrizeMatrix />}
 
       {/* Discord Community CTA Banner */}
       <DiscordCommunityBanner />

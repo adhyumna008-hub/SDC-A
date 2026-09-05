@@ -67,59 +67,72 @@ export const OpportunitiesPage: React.FC = () => {
       </header>
 
       {/* Soft-UI Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredOpps.map((opp) => (
-          <article
-            key={opp.id}
-            className="soft-ui-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between relative overflow-hidden group"
-          >
-            <div className="relative z-10">
-              <div className="flex justify-between items-start mb-4">
-                <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/15 flex items-center justify-center text-electric-cyan shadow-soft-ui">
-                  <span className="material-symbols-outlined text-2xl">
-                    {opp.category === 'hackathon' ? 'emoji_events' : opp.category === 'internship' ? 'work' : 'code_blocks'}
-                  </span>
-                </div>
-
-                <div className="flex gap-1.5 flex-wrap justify-end">
-                  {opp.tags.map((t, idx) => (
-                    <span key={idx} className="px-2.5 py-0.5 rounded-full bg-white/[0.05] text-electric-cyan font-code-sm text-[10px] border border-white/10 font-medium">
-                      {t}
+      {/* Soft-UI Grid */}
+      {filteredOpps.length === 0 ? (
+        <div className="py-20 text-center rounded-3xl bg-white/[0.02] border border-white/10 space-y-4 max-w-2xl mx-auto w-full">
+          <div className="w-16 h-16 rounded-2xl bg-electric-cyan/10 border border-electric-cyan/20 text-electric-cyan flex items-center justify-center mx-auto">
+            <span className="material-symbols-outlined text-3xl">radar</span>
+          </div>
+          <h3 className="text-white font-bold text-lg font-headline-lg">No Active Opportunities Right Now</h3>
+          <p className="text-xs text-white/50 max-w-md mx-auto leading-relaxed">
+            Our leads actively curate world-class hackathons, grants, and internships. Check back soon or watch the announcement ticker for new drop notifications!
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredOpps.map((opp) => (
+            <article
+              key={opp.id}
+              className="soft-ui-card rounded-3xl p-6 sm:p-7 flex flex-col justify-between relative overflow-hidden group"
+            >
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/15 flex items-center justify-center text-electric-cyan shadow-soft-ui">
+                    <span className="material-symbols-outlined text-2xl">
+                      {opp.category === 'hackathon' ? 'emoji_events' : opp.category === 'internship' ? 'work' : 'code_blocks'}
                     </span>
-                  ))}
+                  </div>
+
+                  <div className="flex gap-1.5 flex-wrap justify-end">
+                    {opp.tags.map((t, idx) => (
+                      <span key={idx} className="px-2.5 py-0.5 rounded-full bg-white/[0.05] text-electric-cyan font-code-sm text-[10px] border border-white/10 font-medium">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
                 </div>
+
+                <h3 className="font-headline-lg text-xl font-bold text-white mb-1.5 group-hover:text-neon-purple transition-colors line-clamp-1 leading-snug">
+                  {opp.title}
+                </h3>
+                <p className="font-label-caps text-xs text-on-surface-variant uppercase tracking-wider mb-3 font-bold">
+                  {opp.organization}
+                </p>
+                <p className="text-on-surface-variant text-xs md:text-sm line-clamp-3 mb-6 leading-relaxed">
+                  {opp.description}
+                </p>
               </div>
 
-              <h3 className="font-headline-lg text-xl font-bold text-white mb-1.5 group-hover:text-neon-purple transition-colors line-clamp-1 leading-snug">
-                {opp.title}
-              </h3>
-              <p className="font-label-caps text-xs text-on-surface-variant uppercase tracking-wider mb-3 font-bold">
-                {opp.organization}
-              </p>
-              <p className="text-on-surface-variant text-xs md:text-sm line-clamp-3 mb-6 leading-relaxed">
-                {opp.description}
-              </p>
-            </div>
+              <div className="pt-4 flex items-center justify-between border-t border-white/10 relative z-10">
+                <div className="flex items-center gap-1.5 text-on-surface-variant font-code-sm text-xs">
+                  <span className="material-symbols-outlined text-sm text-tertiary">hourglass_empty</span>
+                  <span>{getDaysRemaining(opp.deadline)}</span>
+                </div>
 
-            <div className="pt-4 flex items-center justify-between border-t border-white/10 relative z-10">
-              <div className="flex items-center gap-1.5 text-on-surface-variant font-code-sm text-xs">
-                <span className="material-symbols-outlined text-sm text-tertiary">hourglass_empty</span>
-                <span>{getDaysRemaining(opp.deadline)}</span>
+                <a
+                  href={opp.externalUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="soft-ui-btn text-white font-code-sm text-xs px-5 py-2 rounded-full border border-white/15 hover:border-white/30 transition-all flex items-center gap-1.5 uppercase font-bold shadow-sm"
+                >
+                  <span>Apply</span>
+                  <span className="material-symbols-outlined text-xs">open_in_new</span>
+                </a>
               </div>
-
-              <a
-                href={opp.externalUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="soft-ui-btn text-white font-code-sm text-xs px-5 py-2 rounded-full border border-white/15 hover:border-white/30 transition-all flex items-center gap-1.5 uppercase font-bold shadow-sm"
-              >
-                <span>Apply</span>
-                <span className="material-symbols-outlined text-xs">open_in_new</span>
-              </a>
-            </div>
-          </article>
-        ))}
-      </div>
+            </article>
+          ))}
+        </div>
+      )}
     </main>
   );
 };

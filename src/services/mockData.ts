@@ -86,60 +86,7 @@ export const INITIAL_IDEAS: IdeaHubRequest[] = [
   }
 ];
 
-export const INITIAL_OPPORTUNITIES: Opportunity[] = [
-  {
-    id: 'opp-01',
-    title: 'Global Hack Week: APIs & Cloud Infrastructure',
-    organization: 'Major League Hacking (MLH)',
-    category: 'hackathon',
-    tags: ['#Hackathon', '#Remote', '#APIs', '#Swag'],
-    description: 'Join thousands of developers for a week-long celebration of building, learning, and sharing. Integrate world-class APIs to win prizes.',
-    externalUrl: 'https://mlh.io',
-    deadline: '2026-10-22T23:59:59.000Z',
-    location: 'Virtual / Remote',
-    stipendOrPrize: '$10,000 Pool',
-    createdAt: '2026-08-25T10:00:00.000Z'
-  },
-  {
-    id: 'opp-02',
-    title: 'Frontend Systems Engineering Intern',
-    organization: 'Vercel',
-    category: 'internship',
-    tags: ['#Internship', '#Remote', '#React', '#NextJS'],
-    description: 'Work on foundational web infrastructure powering millions of sites. Strong TypeScript & performance optimization skills preferred.',
-    externalUrl: 'https://vercel.com/careers',
-    deadline: '2026-09-30T23:59:59.000Z',
-    location: 'Remote (Global)',
-    stipendOrPrize: '$45 / hr',
-    createdAt: '2026-08-26T10:00:00.000Z'
-  },
-  {
-    id: 'opp-03',
-    title: 'Linux Kernel Mentorship Program Spring 2027',
-    organization: 'The Linux Foundation',
-    category: 'opensource',
-    tags: ['#OpenSource', '#C', '#Kernel', '#Stipend'],
-    description: 'A structured 12-week mentorship program bringing new contributors into the Linux kernel ecosystem under guidance from senior kernel maintainers.',
-    externalUrl: 'https://lfx.linuxfoundation.org/mentorship',
-    deadline: '2026-11-01T23:59:59.000Z',
-    location: 'Remote',
-    stipendOrPrize: '$3,000 Stipend',
-    createdAt: '2026-08-20T10:00:00.000Z'
-  },
-  {
-    id: 'opp-04',
-    title: 'Web3 Builder Grant Challenge 2026',
-    organization: 'Ethereum Foundation',
-    category: 'hiring',
-    tags: ['#Web3', '#Grants', '#Solidity', '#Remote'],
-    description: 'Open call for student teams creating privacy-preserving zero-knowledge tooling, Layer 2 scaling prototypes, or decentralized storage utilities.',
-    externalUrl: 'https://ethereum.org/en/grants/',
-    deadline: '2026-12-15T23:59:59.000Z',
-    location: 'Global Remote',
-    stipendOrPrize: '$50,000 Grant',
-    createdAt: '2026-08-21T10:00:00.000Z'
-  }
-];
+export const INITIAL_OPPORTUNITIES: Opportunity[] = [];
 
 export const INITIAL_ANNOUNCEMENTS: SystemAnnouncement[] = [
   { id: 'ann-1', title: '🚀 Registrations are now LIVE for "AI in Civil Engineering Workshop" on September 17th!', type: 'urgent', active: true },
