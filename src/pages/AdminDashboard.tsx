@@ -697,7 +697,7 @@ export const AdminDashboard: React.FC = () => {
   return (
     <main className="flex-1 flex flex-col min-h-screen bg-background relative pt-20">
       {/* Header with 3-Line Menu Button */}
-      <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-container-padding py-4 border-b border-outline-variant/10 bg-surface/80 backdrop-blur-md z-20 sticky top-16">
+      <header className="flex items-center justify-between px-container-padding py-3 border-b border-outline-variant/10 bg-surface/80 backdrop-blur-md z-20 sticky top-16">
         <div className="flex items-center gap-3">
           {/* 3-Line Menu Button (Admin Navigation Drawer) */}
           <button
@@ -711,13 +711,13 @@ export const AdminDashboard: React.FC = () => {
             </span>
           </button>
 
-          <h1 className="font-headline-lg text-xl md:text-2xl text-on-surface flex items-center gap-2.5 font-bold">
-            <span className="material-symbols-outlined text-neon-purple text-2xl">admin_panel_settings</span>
+          <h1 className="font-headline-lg text-lg md:text-xl text-on-surface flex items-center gap-2 font-bold">
+            <span className="material-symbols-outlined text-neon-purple text-xl">admin_panel_settings</span>
             <span>Command Center</span>
           </h1>
 
           {/* Active Tab Chip Indicator */}
-          <span className="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs font-mono font-bold text-white/70 ml-1">
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-xs font-mono font-bold text-white/70">
             <span className="w-1.5 h-1.5 rounded-full bg-neon-purple animate-pulse"></span>
             <span>
               {adminNavTab === 'payments' ? 'UPI Verification' : adminNavTab === 'events' ? 'Events & Roster' : adminNavTab === 'ideas' ? 'Idea Hub Moderation' : 'System Settings'}
@@ -725,43 +725,15 @@ export const AdminDashboard: React.FC = () => {
           </span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 mt-3 sm:mt-0">
-          <button
-            onClick={() => setShowQRScanner(true)}
-            className="bg-white text-black hover:bg-white/90 px-4 py-2 rounded-full font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-sm">qr_code_scanner</span>
-            <span>QR Scanner</span>
-          </button>
-
-          <button
-            onClick={() => setShowNewOppModal(true)}
-            className="bg-[#12121a] border border-[#1f1f2e] text-white/80 hover:text-white hover:border-white px-4 py-2 rounded-full font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-sm text-electric-cyan">hub</span>
-            <span>Publish Opportunity</span>
-          </button>
-
-          <button
-            onClick={handleExportAllClubExcel}
-            className="bg-[#12121a] border border-emerald-500/30 text-emerald-400 hover:text-white hover:bg-emerald-500/20 px-4 py-2 rounded-full font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.2)]"
-            title="Export complete club database across all events to Excel (.xlsx)"
-          >
-            <span className="material-symbols-outlined text-sm">table_view</span>
-            <span>Export All (.xlsx)</span>
-          </button>
-
-          <button
-            onClick={() => setShowNewEventModal(true)}
-            className="bg-[#A855F7] hover:bg-[#9333ea] text-white px-5 py-2 rounded-full font-bold text-xs uppercase tracking-wider transition-all flex items-center gap-1.5 shadow-[0_0_15px_rgba(168,85,247,0.4)] cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-sm">add</span>
-            <span>New Event</span>
-          </button>
+        <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-1.5 text-[11px] font-mono text-emerald-400/80 mr-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>Live</span>
+          </div>
         </div>
       </header>
 
-      {/* Slide-out Navigation Drawer (Appears when 3-line hamburger button is clicked) */}
+      {/* Slide-out Navigation Drawer */}
       {isDrawerOpen && (
         <div className="fixed inset-0 z-[99999] flex animate-fadeIn">
           {/* Backdrop */}
@@ -770,135 +742,173 @@ export const AdminDashboard: React.FC = () => {
             className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity"
           ></div>
 
-          {/* Drawer Menu Panel */}
-          <div className="relative w-80 max-w-[85vw] h-full bg-[#080d1a] border-r border-white/15 p-6 flex flex-col justify-between shadow-2xl z-10 animate-slideRight">
-            <div className="space-y-6">
-              {/* Drawer Header */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-neon-purple/20 border border-neon-purple/50 flex items-center justify-center text-neon-purple shadow-[0_0_15px_rgba(168,85,247,0.4)]">
-                    <span className="material-symbols-outlined text-lg">admin_panel_settings</span>
-                  </div>
-                  <div>
-                    <h3 className="font-headline-lg text-white font-bold text-base leading-tight">Admin Terminal</h3>
-                    <p className="text-[10px] font-mono text-white/50">Navigation Panel</p>
-                  </div>
+          {/* Drawer Panel */}
+          <div className="relative w-80 max-w-[85vw] h-full bg-[#080d1a] border-r border-white/15 p-5 flex flex-col shadow-2xl z-10 animate-slideRight overflow-y-auto">
+            {/* Drawer Header */}
+            <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-5">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-neon-purple/20 border border-neon-purple/50 flex items-center justify-center text-neon-purple shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                  <span className="material-symbols-outlined text-lg">admin_panel_settings</span>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsDrawerOpen(false)}
-                  className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-white/70 hover:text-white flex items-center justify-center border border-white/10 cursor-pointer"
-                >
-                  <span className="material-symbols-outlined text-sm">close</span>
-                </button>
-              </div>
-
-              {/* Navigation Options List */}
-              <nav className="space-y-2">
-                <button
-                  type="button"
-                  onClick={() => { setAdminNavTab('payments'); setIsDrawerOpen(false); }}
-                  className={`w-full p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
-                    adminNavTab === 'payments'
-                      ? 'bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.2)]'
-                      : 'bg-white/[0.03] border-white/10 text-white/70 hover:bg-white/[0.08] hover:text-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-xl text-amber-400">receipt_long</span>
-                    <div>
-                      <div className="text-xs font-bold text-white">UPI & Screenshot Review</div>
-                      <div className="text-[10px] text-white/50">Verify UTR and entry passes</div>
-                    </div>
-                  </div>
-                  {registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'pending_review').length > 0 && (
-                    <span className="px-2 py-0.5 rounded-full bg-amber-500 text-black text-[10px] font-mono font-bold animate-pulse">
-                      {registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'pending_review').length}
-                    </span>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => { setAdminNavTab('events'); setIsDrawerOpen(false); }}
-                  className={`w-full p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
-                    adminNavTab === 'events'
-                      ? 'bg-neon-purple/20 border-neon-purple/50 text-white shadow-[0_0_20px_rgba(168,85,247,0.2)]'
-                      : 'bg-white/[0.03] border-white/10 text-white/70 hover:bg-white/[0.08] hover:text-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-xl text-neon-purple">event_available</span>
-                    <div>
-                      <div className="text-xs font-bold text-white">Events & Attendance</div>
-                      <div className="text-[10px] text-white/50">Manage seats, roster & exports</div>
-                    </div>
-                  </div>
-                  <span className="px-2 py-0.5 rounded-full bg-white/10 text-white text-[10px] font-mono">
-                    {events.length}
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => { setAdminNavTab('ideas'); setIsDrawerOpen(false); }}
-                  className={`w-full p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
-                    adminNavTab === 'ideas'
-                      ? 'bg-electric-cyan/20 border-electric-cyan/50 text-white shadow-[0_0_20px_rgba(56,189,248,0.2)]'
-                      : 'bg-white/[0.03] border-white/10 text-white/70 hover:bg-white/[0.08] hover:text-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-xl text-electric-cyan">how_to_vote</span>
-                    <div>
-                      <div className="text-xs font-bold text-white">Idea Hub Moderation</div>
-                      <div className="text-[10px] text-white/50">Community workshop proposals</div>
-                    </div>
-                  </div>
-                  {ideas.filter(i => i.status === 'pending').length > 0 && (
-                    <span className="px-2 py-0.5 rounded-full bg-electric-cyan/20 text-electric-cyan text-[10px] font-mono font-bold">
-                      {ideas.filter(i => i.status === 'pending').length}
-                    </span>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => { setAdminNavTab('overview'); setIsDrawerOpen(false); }}
-                  className={`w-full p-3.5 rounded-2xl border text-left transition-all flex items-center justify-between group cursor-pointer ${
-                    adminNavTab === 'overview'
-                      ? 'bg-white/15 border-white/30 text-white shadow-sm'
-                      : 'bg-white/[0.03] border-white/10 text-white/70 hover:bg-white/[0.08] hover:text-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-xl text-white/80">dashboard</span>
-                    <div>
-                      <div className="text-xs font-bold text-white">System & Settings</div>
-                      <div className="text-[10px] text-white/50">Matrix toggles & status</div>
-                    </div>
-                  </div>
-                </button>
-              </nav>
-            </div>
-
-            {/* Drawer Footer */}
-            <div className="border-t border-white/10 pt-4 space-y-3">
-              <div className="flex items-center justify-between text-[11px] font-mono text-white/50">
-                <span>Database Status</span>
-                <span className="text-emerald-400 font-bold flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                  Live Sync
-                </span>
+                <div>
+                  <h3 className="font-headline-lg text-white font-bold text-sm leading-tight">Command Center</h3>
+                  <p className="text-[10px] font-mono text-white/40">Admin Navigation</p>
+                </div>
               </div>
               <button
                 type="button"
-                onClick={() => { setShowQRScanner(true); setIsDrawerOpen(false); }}
-                className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+                onClick={() => setIsDrawerOpen(false)}
+                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-white/70 hover:text-white flex items-center justify-center border border-white/10 cursor-pointer"
               >
-                <span className="material-symbols-outlined text-base">qr_code_scanner</span>
-                <span>Launch QR Badge Scanner</span>
+                <span className="material-symbols-outlined text-sm">close</span>
               </button>
+            </div>
+
+            {/* Section Label: Views */}
+            <p className="text-[9px] font-mono text-white/30 uppercase tracking-widest mb-2 px-1">Views</p>
+
+            {/* Navigation Items — Ordered: Events → UPI Verification → Idea Hub → System */}
+            <nav className="space-y-1.5 mb-6">
+              {/* 1. Events & Attendance */}
+              <button
+                type="button"
+                onClick={() => { setAdminNavTab('events'); setIsDrawerOpen(false); }}
+                className={`w-full p-3 rounded-xl border text-left transition-all flex items-center justify-between cursor-pointer ${
+                  adminNavTab === 'events'
+                    ? 'bg-neon-purple/15 border-neon-purple/40 text-white'
+                    : 'bg-white/[0.02] border-white/[0.06] text-white/60 hover:bg-white/[0.06] hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="material-symbols-outlined text-lg text-neon-purple">event_available</span>
+                  <div>
+                    <div className="text-xs font-bold">Events & Attendance</div>
+                    <div className="text-[10px] text-white/40">Manage seats, roster & exports</div>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-white/10 text-white/70 text-[10px] font-mono">
+                  {events.length}
+                </span>
+              </button>
+
+              {/* 2. UPI & Screenshot Review */}
+              <button
+                type="button"
+                onClick={() => { setAdminNavTab('payments'); setIsDrawerOpen(false); }}
+                className={`w-full p-3 rounded-xl border text-left transition-all flex items-center justify-between cursor-pointer ${
+                  adminNavTab === 'payments'
+                    ? 'bg-amber-500/15 border-amber-500/40 text-amber-300'
+                    : 'bg-white/[0.02] border-white/[0.06] text-white/60 hover:bg-white/[0.06] hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="material-symbols-outlined text-lg text-amber-400">receipt_long</span>
+                  <div>
+                    <div className="text-xs font-bold">UPI & Screenshot Review</div>
+                    <div className="text-[10px] text-white/40">Verify UTR & entry passes</div>
+                  </div>
+                </div>
+                {registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'pending_review').length > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500 text-black text-[10px] font-mono font-bold animate-pulse">
+                    {registrations.filter(r => r.passType === 'paid' && r.paymentStatus === 'pending_review').length}
+                  </span>
+                )}
+              </button>
+
+              {/* 3. Idea Hub Moderation */}
+              <button
+                type="button"
+                onClick={() => { setAdminNavTab('ideas'); setIsDrawerOpen(false); }}
+                className={`w-full p-3 rounded-xl border text-left transition-all flex items-center justify-between cursor-pointer ${
+                  adminNavTab === 'ideas'
+                    ? 'bg-electric-cyan/15 border-electric-cyan/40 text-white'
+                    : 'bg-white/[0.02] border-white/[0.06] text-white/60 hover:bg-white/[0.06] hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="material-symbols-outlined text-lg text-electric-cyan">how_to_vote</span>
+                  <div>
+                    <div className="text-xs font-bold">Idea Hub Moderation</div>
+                    <div className="text-[10px] text-white/40">Community workshop proposals</div>
+                  </div>
+                </div>
+                {ideas.filter(i => i.status === 'pending').length > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-electric-cyan/20 text-electric-cyan text-[10px] font-mono font-bold">
+                    {ideas.filter(i => i.status === 'pending').length}
+                  </span>
+                )}
+              </button>
+
+              {/* 4. System & Settings */}
+              <button
+                type="button"
+                onClick={() => { setAdminNavTab('overview'); setIsDrawerOpen(false); }}
+                className={`w-full p-3 rounded-xl border text-left transition-all flex items-center justify-between cursor-pointer ${
+                  adminNavTab === 'overview'
+                    ? 'bg-white/10 border-white/25 text-white'
+                    : 'bg-white/[0.02] border-white/[0.06] text-white/60 hover:bg-white/[0.06] hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="material-symbols-outlined text-lg text-white/60">settings</span>
+                  <div>
+                    <div className="text-xs font-bold">System & Settings</div>
+                    <div className="text-[10px] text-white/40">Matrix toggles & status</div>
+                  </div>
+                </div>
+              </button>
+            </nav>
+
+            {/* Section Label: Quick Actions */}
+            <p className="text-[9px] font-mono text-white/30 uppercase tracking-widest mb-2 px-1">Quick Actions</p>
+
+            <div className="space-y-1.5 mb-auto">
+              <button
+                type="button"
+                onClick={() => { setShowNewEventModal(true); setIsDrawerOpen(false); }}
+                className="w-full p-2.5 rounded-xl bg-neon-purple/10 hover:bg-neon-purple/20 border border-neon-purple/30 text-white text-xs font-bold flex items-center gap-2.5 transition-all cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-base text-neon-purple">add_circle</span>
+                <span>Create New Event</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setShowQRScanner(true); setIsDrawerOpen(false); }}
+                className="w-full p-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white text-xs font-bold flex items-center gap-2.5 transition-all cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-base text-white/70">qr_code_scanner</span>
+                <span>QR Badge Scanner</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setShowNewOppModal(true); setIsDrawerOpen(false); }}
+                className="w-full p-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-white text-xs font-bold flex items-center gap-2.5 transition-all cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-base text-electric-cyan/70">hub</span>
+                <span>Publish Opportunity</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { handleExportAllClubExcel(); setIsDrawerOpen(false); }}
+                className="w-full p-2.5 rounded-xl bg-white/[0.04] hover:bg-emerald-500/10 border border-white/10 hover:border-emerald-500/30 text-white text-xs font-bold flex items-center gap-2.5 transition-all cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-base text-emerald-400/70">table_view</span>
+                <span>Export All Data (.xlsx)</span>
+              </button>
+            </div>
+
+            {/* Drawer Footer */}
+            <div className="border-t border-white/10 pt-3 mt-4">
+              <div className="flex items-center justify-between text-[10px] font-mono text-white/40">
+                <span>Firestore</span>
+                <span className="text-emerald-400 font-bold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                  Connected
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -906,32 +916,6 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Main Content Area */}
       <div className="p-container-padding space-y-8 max-w-7xl mx-auto w-full">
-        {/* Sleek Subheader / View Indicator Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setIsDrawerOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/[0.05] hover:bg-neon-purple/20 border border-white/15 hover:border-neon-purple/50 text-white text-xs font-bold transition-all shadow-soft-ui cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-base text-neon-purple">menu</span>
-              <span>Switch Admin View</span>
-              <span className="material-symbols-outlined text-sm text-white/40">expand_more</span>
-            </button>
-
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-white/[0.03] border border-white/10 text-xs font-mono text-white/80">
-              <span className="text-white/40 uppercase text-[10px]">Active View:</span>
-              <span className="text-white font-bold">
-                {adminNavTab === 'payments' ? 'UPI & Screenshot Verification' : adminNavTab === 'events' ? 'Events & Attendance Roster' : adminNavTab === 'ideas' ? 'Idea Hub Moderation' : 'System & Settings'}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs font-code-sm text-on-surface-variant">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>Real-time Firestore Connected</span>
-          </div>
-        </div>
 
         {/* Top Row: System Status & Stats Cards */}
         <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
