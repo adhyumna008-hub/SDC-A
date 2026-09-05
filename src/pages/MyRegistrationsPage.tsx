@@ -73,21 +73,39 @@ export const MyRegistrationsPage: React.FC = () => {
               >
                 {/* Status Header */}
                 <div className="flex justify-between items-start mb-4 pb-4 border-b border-white/10 relative z-10">
-                  <div>
-                    <span className={`font-label-caps text-[10px] px-3 py-1 rounded-full border uppercase font-bold ${
-                      reg.status === 'confirmed'
-                        ? 'bg-success-glow/20 text-success-glow border-success-glow/40 shadow-sm'
-                        : 'bg-tertiary/20 text-tertiary border-tertiary/40'
-                    }`}>
-                      {reg.status}
-                    </span>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {reg.passType === 'paid' ? (
+                      reg.paymentStatus === 'approved' ? (
+                        <span className="font-label-caps text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-3 py-1 rounded-full uppercase font-bold shadow-[0_0_12px_rgba(16,185,129,0.2)] flex items-center gap-1">
+                          <span className="material-symbols-outlined text-xs">verified</span>
+                          <span>PAID PASS (₹{reg.amountPaid || 99}) VERIFIED</span>
+                        </span>
+                      ) : reg.paymentStatus === 'rejected' ? (
+                        <span className="font-label-caps text-[10px] bg-error-container/30 text-error border border-error/40 px-3 py-1 rounded-full uppercase font-bold">
+                          PAYMENT REJECTED
+                        </span>
+                      ) : (
+                        <span className="font-label-caps text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-3 py-1 rounded-full uppercase font-bold shadow-[0_0_12px_rgba(245,158,11,0.25)] flex items-center gap-1">
+                          <span className="material-symbols-outlined text-xs">hourglass_top</span>
+                          <span>PAYMENT UNDER REVIEW (₹{reg.amountPaid || 99})</span>
+                        </span>
+                      )
+                    ) : (
+                      <span className={`font-label-caps text-[10px] px-3 py-1 rounded-full border uppercase font-bold ${
+                        reg.status === 'confirmed'
+                          ? 'bg-success-glow/20 text-success-glow border-success-glow/40 shadow-sm'
+                          : 'bg-tertiary/20 text-tertiary border-tertiary/40'
+                      }`}>
+                        {reg.status} (FREE PASS)
+                      </span>
+                    )}
 
                     {reg.checkedIn ? (
-                      <span className="ml-2 font-label-caps text-[10px] bg-success-glow/20 text-success-glow border border-success-glow/50 px-2.5 py-1 rounded-full uppercase font-bold shadow-sm flex-inline items-center gap-1">
+                      <span className="font-label-caps text-[10px] bg-success-glow/20 text-success-glow border border-success-glow/50 px-2.5 py-1 rounded-full uppercase font-bold shadow-sm flex items-center gap-1">
                         ✓ PRESENT (CHECKED IN)
                       </span>
                     ) : (
-                      <span className="ml-2 font-label-caps text-[10px] bg-white/10 text-on-surface-variant border border-white/15 px-2.5 py-1 rounded-full uppercase font-bold">
+                      <span className="font-label-caps text-[10px] bg-white/10 text-on-surface-variant border border-white/15 px-2.5 py-1 rounded-full uppercase font-bold">
                         PENDING CHECK-IN
                       </span>
                     )}
@@ -106,6 +124,18 @@ export const MyRegistrationsPage: React.FC = () => {
                     
                     <div className="text-xs font-code-sm text-on-surface-variant space-y-1.5">
                       <div><strong className="text-white">Participant:</strong> {reg.userName}</div>
+                      <div>
+                        <strong className="text-white">Pass Type:</strong>{' '}
+                        <span className="text-electric-cyan font-bold">
+                          {reg.passType === 'paid' ? `Paid Workshop Pass (₹${reg.amountPaid || 99})` : 'Free Pass'}
+                        </span>
+                      </div>
+                      {reg.utrNumber && (
+                        <div>
+                          <strong className="text-white">UTR Reference:</strong>{' '}
+                          <span className="font-mono text-amber-300 font-bold">{reg.utrNumber}</span>
+                        </div>
+                      )}
                       {reg.phoneNumber && (
                         <div><strong className="text-white">Phone / WhatsApp:</strong> <span className="font-mono text-white">{reg.phoneNumber}</span></div>
                       )}
@@ -126,12 +156,26 @@ export const MyRegistrationsPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* QR Code Pass */}
+                  {/* QR Code Pass OR Locked Pending Review */}
                   <div className="flex flex-col items-center justify-center p-3.5 rounded-2xl soft-ui-inset">
-                    <div className="p-2 bg-white rounded-xl shadow-lg">
-                      <QRCodeSVG value={qrPayload} size={105} level="H" includeMargin={true} />
-                    </div>
-                    <span className="font-code-sm text-[9px] text-electric-cyan font-bold mt-2 uppercase tracking-wider">Fast Check-in Pass</span>
+                    {reg.passType === 'paid' && reg.paymentStatus === 'pending_review' ? (
+                      <div className="flex flex-col items-center justify-center py-4 px-2 text-center">
+                        <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 mb-2 shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+                          <span className="material-symbols-outlined text-2xl">lock</span>
+                        </div>
+                        <span className="font-headline-lg text-xs font-bold text-white">Entry Badge Locked</span>
+                        <span className="font-code-sm text-[10px] text-amber-300/90 mt-1 max-w-[130px] leading-tight">
+                          Awaiting Admin approval for UTR #{reg.utrNumber?.substring(0, 6)}...
+                        </span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="p-2 bg-white rounded-xl shadow-lg">
+                          <QRCodeSVG value={qrPayload} size={105} level="H" includeMargin={true} />
+                        </div>
+                        <span className="font-code-sm text-[9px] text-electric-cyan font-bold mt-2 uppercase tracking-wider">Fast Check-in Pass</span>
+                      </>
+                    )}
                   </div>
                 </div>
 

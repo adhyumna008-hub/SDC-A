@@ -195,6 +195,16 @@ export const EventsPage: React.FC = () => {
                       {evt.category}
                     </span>
 
+                    {evt.feeType === 'paid' || (evt.ticketPrice !== undefined && evt.ticketPrice > 0) ? (
+                      <span className="font-label-caps text-[10px] bg-amber-500/25 text-amber-300 border border-amber-500/50 px-2.5 py-1 rounded-xl backdrop-blur-md uppercase font-bold flex items-center gap-1 shadow-[0_0_12px_rgba(245,158,11,0.3)]">
+                        <span>₹{evt.ticketPrice || 99} PASS</span>
+                      </span>
+                    ) : (
+                      <span className="font-label-caps text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-1 rounded-xl backdrop-blur-md uppercase font-bold">
+                        FREE PASS
+                      </span>
+                    )}
+
                     {evt.hostingType === 'external' && (
                       <span className="font-label-caps text-[10px] bg-electric-cyan/20 text-electric-cyan border border-electric-cyan/40 px-2.5 py-1 rounded-xl backdrop-blur-md uppercase font-bold flex items-center gap-1">
                         <span className="material-symbols-outlined text-[12px]">public</span>

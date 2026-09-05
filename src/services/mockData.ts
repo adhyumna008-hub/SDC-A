@@ -18,6 +18,9 @@ export const INITIAL_EVENTS: EventItem[] = [
     max_seats: 150,
     registered_count: 0,
     attendance_count: 0,
+    feeType: 'paid',
+    ticketPrice: 99,
+    upiId: 'sdcvce@okhdfcbank',
     createdAt: '2026-08-29T05:08:25.553Z'
   },
   {

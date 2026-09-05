@@ -13,6 +13,7 @@ import {
   createOpportunityService,
   getAllRegistrationsService,
   subscribeAllRegistrationsService,
+  updateRegistrationPaymentStatusService,
   updateClubSettingsService,
   subscribeClubSettingsService
 } from '../services/dataService';
@@ -32,7 +33,8 @@ export const AdminDashboard: React.FC = () => {
   const [showNewOppModal, setShowNewOppModal] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
   const [viewingRegistrationsEvent, setViewingRegistrationsEvent] = useState<EventItem | null>(null);
-  const [rosterFilter, setRosterFilter] = useState<'all' | 'present' | 'absent' | 'vardhaman' | 'other'>('all');
+  const [rosterFilter, setRosterFilter] = useState<'all' | 'present' | 'absent' | 'vardhaman' | 'other' | 'paid_pending' | 'paid_approved' | 'free'>('all');
+  const [viewingScreenshotUrl, setViewingScreenshotUrl] = useState<string | null>(null);
 
   // New Event Form State
   const [evtTitle, setEvtTitle] = useState('');
@@ -231,6 +233,10 @@ export const AdminDashboard: React.FC = () => {
         'Team Code': r.teamCode || 'N/A',
         'Total Team Size': memberCount,
         'Team Members Details': membersFormatted,
+        'Pass Type': r.passType === 'paid' ? 'Paid Workshop Pass' : 'Free Pass',
+        'Amount Paid (₹)': r.amountPaid !== undefined ? r.amountPaid : (r.passType === 'paid' ? 99 : 0),
+        'UTR / Reference Number': r.utrNumber || 'N/A',
+        'Payment Status': (r.paymentStatus || (r.passType === 'paid' ? 'pending_review' : 'free_verified')).toUpperCase(),
         'Attendance Status': r.checkedIn ? 'PRESENT' : 'ABSENT',
         'Registration Status': (r.status || 'confirmed').toUpperCase(),
         'Check-In Date': checkedInDate ? checkedInDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Not Checked In',
@@ -442,6 +448,10 @@ export const AdminDashboard: React.FC = () => {
         'Registration Mode': r.registrationType === 'team' ? 'Team' : 'Solo',
         'Team Name': r.teamName || 'N/A',
         'Team Code': r.teamCode || 'N/A',
+        'Pass Type': r.passType === 'paid' ? 'Paid Workshop Pass' : 'Free Pass',
+        'Amount Paid (₹)': r.amountPaid !== undefined ? r.amountPaid : (r.passType === 'paid' ? 99 : 0),
+        'UTR / Reference Number': r.utrNumber || 'N/A',
+        'Payment Status': (r.paymentStatus || (r.passType === 'paid' ? 'pending_review' : 'free_verified')).toUpperCase(),
         'Attendance Status': r.checkedIn ? 'PRESENT' : 'ABSENT',
         'Check-In Date': checkedInDate ? checkedInDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Not Checked In',
         'Check-In Time': checkedInDate ? checkedInDate.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }) : 'N/A',
@@ -606,6 +616,28 @@ export const AdminDashboard: React.FC = () => {
       } catch (e) {
         console.warn('Firestore toggle check-in error', e);
       }
+    }
+  };
+
+  const handleApprovePayment = async (reg: EventRegistration) => {
+    try {
+      await updateRegistrationPaymentStatusService(reg.id, 'approved');
+      setRegistrations(prev => prev.map(r => r.id === reg.id ? { ...r, paymentStatus: 'approved', status: 'confirmed' } : r));
+    } catch (e) {
+      console.warn('Error approving pass payment:', e);
+      alert('Failed to approve payment. Please check console.');
+    }
+  };
+
+  const handleRejectPayment = async (reg: EventRegistration) => {
+    if (!confirm(`Are you sure you want to reject the payment for ${reg.userName} (UTR: ${reg.utrNumber || 'N/A'})?`)) {
+      return;
+    }
+    try {
+      await updateRegistrationPaymentStatusService(reg.id, 'rejected');
+      setRegistrations(prev => prev.map(r => r.id === reg.id ? { ...r, paymentStatus: 'rejected', status: 'cancelled' } : r));
+    } catch (e) {
+      console.warn('Error rejecting pass payment:', e);
     }
   };
 
@@ -1220,11 +1252,19 @@ export const AdminDashboard: React.FC = () => {
         const vCount = eventRegs.filter(r => r.collegeName.toLowerCase().includes('vardhaman')).length;
         const oCount = eventRegs.length - vCount;
 
+        const paidRegs = eventRegs.filter(r => r.passType === 'paid');
+        const pendingPaidCount = paidRegs.filter(r => r.paymentStatus === 'pending_review').length;
+        const approvedPaidCount = paidRegs.filter(r => r.paymentStatus === 'approved').length;
+        const freeCount = eventRegs.filter(r => r.passType !== 'paid').length;
+
         const filteredRegs = eventRegs.filter(r => {
           if (rosterFilter === 'present') return r.checkedIn;
           if (rosterFilter === 'absent') return !r.checkedIn;
           if (rosterFilter === 'vardhaman') return r.collegeName.toLowerCase().includes('vardhaman');
           if (rosterFilter === 'other') return !r.collegeName.toLowerCase().includes('vardhaman');
+          if (rosterFilter === 'paid_pending') return r.passType === 'paid' && r.paymentStatus === 'pending_review';
+          if (rosterFilter === 'paid_approved') return r.passType === 'paid' && r.paymentStatus === 'approved';
+          if (rosterFilter === 'free') return r.passType !== 'paid';
           return true;
         });
 
@@ -1278,40 +1318,73 @@ export const AdminDashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* Attendance Statistics Strip */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {/* Attendance & Payment Statistics Strip */}
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                 <div className="p-3 rounded-2xl bg-white/[0.03] border border-white/10 text-center">
-                  <span className="text-[10px] font-code-sm text-on-surface-variant uppercase block">Total Registered</span>
+                  <span className="text-[10px] font-code-sm text-on-surface-variant uppercase block">Total</span>
                   <span className="text-xl font-bold text-white">{eventRegs.length}</span>
                 </div>
+                <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-center">
+                  <span className="text-[10px] font-code-sm text-amber-300 uppercase block font-bold">UTR Pending</span>
+                  <span className="text-xl font-bold text-amber-300">{pendingPaidCount}</span>
+                </div>
+                <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center">
+                  <span className="text-[10px] font-code-sm text-emerald-300 uppercase block font-bold">Paid Approved</span>
+                  <span className="text-xl font-bold text-emerald-300">{approvedPaidCount}</span>
+                </div>
                 <div className="p-3 rounded-2xl bg-success-glow/10 border border-success-glow/30 text-center">
-                  <span className="text-[10px] font-code-sm text-success-glow uppercase block font-bold">Present (Attended)</span>
+                  <span className="text-[10px] font-code-sm text-success-glow uppercase block font-bold">Present</span>
                   <span className="text-xl font-bold text-success-glow">{presentCount}</span>
                 </div>
-                <div className="p-3 rounded-2xl bg-error-container/15 border border-error/30 text-center">
-                  <span className="text-[10px] font-code-sm text-error uppercase block font-bold">Absent (Pending)</span>
-                  <span className="text-xl font-bold text-error">{absentCount}</span>
-                </div>
-                <div className="p-3 rounded-2xl bg-electric-cyan/10 border border-electric-cyan/30 text-center">
-                  <span className="text-[10px] font-code-sm text-electric-cyan uppercase block font-bold">Vardhaman / External</span>
+                <div className="p-3 rounded-2xl bg-electric-cyan/10 border border-electric-cyan/30 text-center col-span-2 sm:col-span-1">
+                  <span className="text-[10px] font-code-sm text-electric-cyan uppercase block font-bold">VCE / Other</span>
                   <span className="text-xl font-bold text-white">{vCount} / {oCount}</span>
                 </div>
               </div>
 
               {/* Filters Bar */}
-              <div className="flex flex-wrap items-center gap-2 border-b border-white/10 pb-3 text-xs font-code-sm">
-                <span className="text-on-surface-variant mr-1">Filter View:</span>
+              <div className="flex flex-wrap items-center gap-1.5 border-b border-white/10 pb-3 text-xs font-code-sm">
+                <span className="text-on-surface-variant mr-1 text-[11px]">Filter:</span>
                 <button
                   onClick={() => setRosterFilter('all')}
-                  className={`px-3 py-1 rounded-xl transition-colors ${
+                  className={`px-2.5 py-1 rounded-xl transition-colors ${
                     rosterFilter === 'all' ? 'bg-white/20 text-white font-bold' : 'text-on-surface-variant hover:text-white'
                   }`}
                 >
                   All ({eventRegs.length})
                 </button>
+                {pendingPaidCount > 0 && (
+                  <button
+                    onClick={() => setRosterFilter('paid_pending')}
+                    className={`px-2.5 py-1 rounded-xl transition-colors flex items-center gap-1 ${
+                      rosterFilter === 'paid_pending'
+                        ? 'bg-amber-500/30 text-amber-300 font-bold border border-amber-500/50 shadow-[0_0_12px_rgba(245,158,11,0.3)]'
+                        : 'bg-amber-500/10 text-amber-300/80 hover:text-amber-200 border border-amber-500/20'
+                    }`}
+                  >
+                    <span className="material-symbols-outlined text-xs">hourglass_top</span>
+                    <span>Payment Pending ({pendingPaidCount})</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => setRosterFilter('paid_approved')}
+                  className={`px-2.5 py-1 rounded-xl transition-colors ${
+                    rosterFilter === 'paid_approved' ? 'bg-emerald-500/25 text-emerald-300 font-bold border border-emerald-500/40' : 'text-on-surface-variant hover:text-white'
+                  }`}
+                >
+                  Paid Approved ({approvedPaidCount})
+                </button>
+                <button
+                  onClick={() => setRosterFilter('free')}
+                  className={`px-2.5 py-1 rounded-xl transition-colors ${
+                    rosterFilter === 'free' ? 'bg-white/20 text-white font-bold border border-white/30' : 'text-on-surface-variant hover:text-white'
+                  }`}
+                >
+                  Free Passes ({freeCount})
+                </button>
                 <button
                   onClick={() => setRosterFilter('present')}
-                  className={`px-3 py-1 rounded-xl transition-colors ${
+                  className={`px-2.5 py-1 rounded-xl transition-colors ${
                     rosterFilter === 'present' ? 'bg-success-glow/25 text-success-glow font-bold border border-success-glow/40' : 'text-on-surface-variant hover:text-white'
                   }`}
                 >
@@ -1319,7 +1392,7 @@ export const AdminDashboard: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setRosterFilter('absent')}
-                  className={`px-3 py-1 rounded-xl transition-colors ${
+                  className={`px-2.5 py-1 rounded-xl transition-colors ${
                     rosterFilter === 'absent' ? 'bg-error-container/30 text-error font-bold border border-error/40' : 'text-on-surface-variant hover:text-white'
                   }`}
                 >
@@ -1327,19 +1400,19 @@ export const AdminDashboard: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setRosterFilter('vardhaman')}
-                  className={`px-3 py-1 rounded-xl transition-colors ${
+                  className={`px-2.5 py-1 rounded-xl transition-colors ${
                     rosterFilter === 'vardhaman' ? 'bg-neon-purple/25 text-neon-purple font-bold border border-neon-purple/40' : 'text-on-surface-variant hover:text-white'
                   }`}
                 >
-                  Vardhaman College ({vCount})
+                  VCE ({vCount})
                 </button>
                 <button
                   onClick={() => setRosterFilter('other')}
-                  className={`px-3 py-1 rounded-xl transition-colors ${
+                  className={`px-2.5 py-1 rounded-xl transition-colors ${
                     rosterFilter === 'other' ? 'bg-electric-cyan/25 text-electric-cyan font-bold border border-electric-cyan/40' : 'text-on-surface-variant hover:text-white'
                   }`}
                 >
-                  Other Colleges ({oCount})
+                  Other ({oCount})
                 </button>
               </div>
 
@@ -1350,7 +1423,7 @@ export const AdminDashboard: React.FC = () => {
                     <span className="material-symbols-outlined text-4xl text-neon-purple mb-2">person_search</span>
                     <p className="text-white font-bold text-sm">No Attendees Match This Filter</p>
                     <p className="text-[11px] text-on-surface-variant mt-1">
-                      Try selecting "All" to view the complete registration ledger.
+                      Try selecting &quot;All&quot; to view the complete registration ledger.
                     </p>
                   </div>
                 ) : (
@@ -1358,15 +1431,40 @@ export const AdminDashboard: React.FC = () => {
                     <div
                       key={reg.id}
                       className={`p-4 rounded-2xl border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 transition-all ${
-                        reg.checkedIn
+                        reg.passType === 'paid' && reg.paymentStatus === 'pending_review'
+                          ? 'bg-amber-500/[0.06] border-amber-500/40 shadow-[0_0_15px_rgba(245,158,11,0.15)]'
+                          : reg.checkedIn
                           ? 'bg-success-glow/[0.04] border-success-glow/30 hover:border-success-glow/50'
                           : 'bg-white/[0.02] border-white/10 hover:border-white/20'
                       }`}
                     >
-                      <div className="space-y-1">
+                      <div className="space-y-1.5 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-white font-bold text-sm">{reg.userName}</span>
                           
+                          {/* Pass Type & Payment Badges */}
+                          {reg.passType === 'paid' ? (
+                            reg.paymentStatus === 'approved' ? (
+                              <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] px-2.5 py-0.5 rounded-lg font-code-sm font-bold flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                                <span className="material-symbols-outlined text-xs">verified</span>
+                                <span>PAID PASS (₹{reg.amountPaid || 99}) APPROVED</span>
+                              </span>
+                            ) : reg.paymentStatus === 'rejected' ? (
+                              <span className="bg-red-500/20 text-red-300 border border-red-500/40 text-[10px] px-2.5 py-0.5 rounded-lg font-code-sm font-bold">
+                                PAYMENT REJECTED
+                              </span>
+                            ) : (
+                              <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] px-2.5 py-0.5 rounded-lg font-code-sm font-bold flex items-center gap-1 shadow-[0_0_12px_rgba(245,158,11,0.25)] animate-pulse">
+                                <span className="material-symbols-outlined text-xs">hourglass_top</span>
+                                <span>PAYMENT PENDING REVIEW (₹{reg.amountPaid || 99})</span>
+                              </span>
+                            )
+                          ) : (
+                            <span className="bg-white/10 text-on-surface-variant border border-white/15 text-[10px] px-2 py-0.5 rounded-md font-code-sm font-bold">
+                              FREE PASS
+                            </span>
+                          )}
+
                           {reg.checkedIn ? (
                             <span className="bg-success-glow/20 text-success-glow border border-success-glow/40 text-[10px] px-2.5 py-0.5 rounded-lg font-code-sm font-bold flex items-center gap-1">
                               <span className="material-symbols-outlined text-xs">check_circle</span>
@@ -1389,7 +1487,22 @@ export const AdminDashboard: React.FC = () => {
                           )}
                         </div>
 
-                        <div className="text-xs text-on-surface-variant font-code-sm flex flex-wrap gap-x-4 gap-y-1 pt-0.5">
+                        <div className="text-xs text-on-surface-variant font-code-sm flex flex-wrap gap-x-4 gap-y-1.5 pt-0.5 items-center">
+                          {reg.utrNumber && (
+                            <span className="bg-amber-500/15 border border-amber-500/40 text-amber-300 px-2 py-0.5 rounded text-[11px] font-mono font-bold flex items-center gap-1 shadow-sm">
+                              <span>UTR: {reg.utrNumber}</span>
+                            </span>
+                          )}
+                          {reg.paymentScreenshotUrl && (
+                            <button
+                              type="button"
+                              onClick={() => setViewingScreenshotUrl(reg.paymentScreenshotUrl!)}
+                              className="text-electric-cyan hover:text-white underline transition-colors flex items-center gap-1 text-[11px] font-bold"
+                            >
+                              <span className="material-symbols-outlined text-xs">image</span>
+                              <span>View Receipt Screenshot</span>
+                            </button>
+                          )}
                           <span>Phone: <strong className="text-white font-mono">{reg.phoneNumber || 'N/A'}</strong></span>
                           <span>Email: <strong className="text-white">{reg.userEmail}</strong></span>
                           <span>Roll ID: <strong className="text-white font-mono">{reg.rollNumber}</strong></span>
@@ -1405,8 +1518,31 @@ export const AdminDashboard: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Manual Action Buttons */}
-                      <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                      {/* Action Buttons: Pass Approval + Attendance */}
+                      <div className="flex flex-wrap items-center gap-2 shrink-0 self-end sm:self-center">
+                        {/* If Paid Pass is Pending Review: Show 1-Click Approve Button */}
+                        {reg.passType === 'paid' && reg.paymentStatus === 'pending_review' && (
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleApprovePayment(reg)}
+                              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-black hover:from-emerald-400 hover:to-teal-400 font-bold text-xs font-code-sm shadow-[0_0_15px_rgba(16,185,129,0.35)] transition-all flex items-center gap-1 cursor-pointer"
+                              title="Verify UTR and activate student QR check-in pass"
+                            >
+                              <span className="material-symbols-outlined text-xs">verified</span>
+                              <span>Approve Pass</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRejectPayment(reg)}
+                              className="px-2.5 py-1.5 rounded-xl bg-red-500/15 border border-red-500/30 text-red-300 hover:bg-red-500 hover:text-white font-bold text-xs font-code-sm transition-all"
+                              title="Reject invalid transaction UTR"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        )}
+
                         <button
                           type="button"
                           onClick={() => handleToggleCheckIn(reg)}
@@ -1431,6 +1567,41 @@ export const AdminDashboard: React.FC = () => {
           </div>
         );
       })()}
+
+      {/* Payment Screenshot Modal */}
+      {viewingScreenshotUrl && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-deep-black/90 backdrop-blur-xl animate-fadeIn">
+          <div className="bg-[#0b1326] border border-white/20 rounded-3xl max-w-lg w-full p-5 relative shadow-2xl space-y-4">
+            <div className="flex justify-between items-center border-b border-white/10 pb-3">
+              <h4 className="text-white font-bold text-sm flex items-center gap-2">
+                <span className="material-symbols-outlined text-electric-cyan">receipt_long</span>
+                <span>Submitted Payment Screenshot</span>
+              </h4>
+              <button
+                onClick={() => setViewingScreenshotUrl(null)}
+                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+              >
+                <span className="material-symbols-outlined text-sm">close</span>
+              </button>
+            </div>
+            <div className="max-h-[70vh] overflow-auto rounded-xl border border-white/10 bg-black flex items-center justify-center p-2">
+              <img
+                src={viewingScreenshotUrl}
+                alt="Payment Receipt"
+                className="max-w-full max-h-[65vh] object-contain rounded-lg"
+              />
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setViewingScreenshotUrl(null)}
+                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 };

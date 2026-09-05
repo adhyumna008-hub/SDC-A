@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
+import { QRCodeSVG } from 'qrcode.react';
 import { EventItem, EventRegistration } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { registerForEventService } from '../services/dataService';
@@ -25,6 +26,40 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
   const [collegeType, setCollegeType] = useState<'vardhaman' | 'other'>(isInitialVardhaman ? 'vardhaman' : 'other');
   const [otherCollegeName, setOtherCollegeName] = useState(isInitialVardhaman ? '' : user?.collegeName || '');
   const [rollNumber, setRollNumber] = useState(user?.rollNumber || '');
+
+  // Pricing & Pass Type
+  const isPaidEvent = event.feeType === 'paid' || (event.ticketPrice !== undefined && event.ticketPrice > 0);
+  const ticketPrice = event.ticketPrice || 99;
+  const upiId = event.upiId || 'sdcvce@okhdfcbank';
+  const payeeName = 'Student Developers Club';
+
+  const [passType, setPassType] = useState<'free' | 'paid'>(isPaidEvent ? 'paid' : 'free');
+  const [utrNumber, setUtrNumber] = useState('');
+  const [paymentScreenshotUrl, setPaymentScreenshotUrl] = useState('');
+  const [copiedUpi, setCopiedUpi] = useState(false);
+
+  // UPI deep link
+  const upiDeepLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${ticketPrice}&cu=INR&tn=${encodeURIComponent(`SDC ${event.title.substring(0, 18)} Pass`)}`;
+
+  const handleCopyUpi = () => {
+    navigator.clipboard.writeText(upiId);
+    setCopiedUpi(true);
+    setTimeout(() => setCopiedUpi(false), 2500);
+  };
+
+  const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 3 * 1024 * 1024) {
+      setErrorMsg('Screenshot file size must be under 3MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPaymentScreenshotUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Team vs Solo
   const [regType, setRegType] = useState<'solo' | 'team'>(event.max_team_size > 1 ? 'team' : 'solo');
@@ -106,6 +141,18 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
       }
     }
 
+    if (passType === 'paid') {
+      const cleanUtr = utrNumber.trim();
+      if (!cleanUtr) {
+        setErrorMsg('Please enter your 12-digit UPI Reference / UTR Number to confirm payment.');
+        return;
+      }
+      if (cleanUtr.length < 6) {
+        setErrorMsg('Please enter a valid 12-digit UPI Reference / UTR Number from your payment app.');
+        return;
+      }
+    }
+
     setSubmitting(true);
     setErrorMsg('');
 
@@ -122,6 +169,11 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
         registrationType: regType,
         teamCode: finalTeamCode,
         teamName: finalTeamName,
+        passType,
+        amountPaid: passType === 'paid' ? ticketPrice : 0,
+        utrNumber: passType === 'paid' ? utrNumber.trim() : undefined,
+        paymentScreenshotUrl: passType === 'paid' ? (paymentScreenshotUrl || undefined) : undefined,
+        paymentStatus: passType === 'paid' ? 'pending_review' : 'free_verified',
         status: event.registered_count >= event.max_seats ? 'waitlisted' : 'confirmed'
       });
 
@@ -149,18 +201,38 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
         {/* Confirmation Screen */}
         {confirmedReg ? (
           <div className="py-4 space-y-6 text-center relative z-10 animate-fadeIn">
-            <div className="w-16 h-16 rounded-full bg-success-glow/20 border border-success-glow/50 flex items-center justify-center text-success-glow mx-auto shadow-[0_0_25px_rgba(34,197,94,0.4)]">
-              <span className="material-symbols-outlined text-4xl">verified</span>
-            </div>
+            {confirmedReg.passType === 'paid' ? (
+              <div className="w-16 h-16 rounded-full bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400 mx-auto shadow-[0_0_25px_rgba(245,158,11,0.4)]">
+                <span className="material-symbols-outlined text-4xl">hourglass_top</span>
+              </div>
+            ) : (
+              <div className="w-16 h-16 rounded-full bg-success-glow/20 border border-success-glow/50 flex items-center justify-center text-success-glow mx-auto shadow-[0_0_25px_rgba(34,197,94,0.4)]">
+                <span className="material-symbols-outlined text-4xl">verified</span>
+              </div>
+            )}
 
             <div>
-              <span className="font-label-caps text-[10px] bg-success-glow/20 text-success-glow px-3 py-1 rounded-full uppercase font-bold tracking-wider border border-success-glow/30">
-                OFFICIALLY REGISTERED
-              </span>
-              <h3 className="font-headline-lg text-2xl font-bold text-white mt-2">Registration Confirmed!</h3>
-              <p className="text-xs text-on-surface-variant font-code-sm mt-1">
-                You are officially registered for <strong className="text-white">{event.title}</strong>
-              </p>
+              {confirmedReg.passType === 'paid' ? (
+                <>
+                  <span className="font-label-caps text-[10px] bg-amber-500/20 text-amber-300 px-3 py-1 rounded-full uppercase font-bold tracking-wider border border-amber-500/40">
+                    PAYMENT PENDING REVIEW (₹{confirmedReg.amountPaid})
+                  </span>
+                  <h3 className="font-headline-lg text-2xl font-bold text-white mt-2">Pass Under Verification!</h3>
+                  <p className="text-xs text-on-surface-variant font-code-sm mt-1">
+                    Your registration for <strong className="text-white">{event.title}</strong> has been received with UTR: <strong className="text-amber-300 font-mono">{confirmedReg.utrNumber}</strong>
+                  </p>
+                </>
+              ) : (
+                <>
+                  <span className="font-label-caps text-[10px] bg-success-glow/20 text-success-glow px-3 py-1 rounded-full uppercase font-bold tracking-wider border border-success-glow/30">
+                    OFFICIALLY REGISTERED
+                  </span>
+                  <h3 className="font-headline-lg text-2xl font-bold text-white mt-2">Registration Confirmed!</h3>
+                  <p className="text-xs text-on-surface-variant font-code-sm mt-1">
+                    You are officially registered for <strong className="text-white">{event.title}</strong>
+                  </p>
+                </>
+              )}
             </div>
 
             {/* Attendee Confirmation Summary */}
@@ -169,6 +241,18 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
                 <span className="text-on-surface-variant">Participant:</span>
                 <span className="text-white font-bold">{confirmedReg.userName}</span>
               </div>
+              <div className="flex justify-between border-b border-white/10 pb-2">
+                <span className="text-on-surface-variant">Pass Type:</span>
+                <span className="text-white font-bold">
+                  {confirmedReg.passType === 'paid' ? `Paid Workshop Pass (₹${confirmedReg.amountPaid})` : 'Free Pass'}
+                </span>
+              </div>
+              {confirmedReg.utrNumber && (
+                <div className="flex justify-between border-b border-white/10 pb-2">
+                  <span className="text-on-surface-variant">UTR Reference:</span>
+                  <span className="text-amber-300 font-mono font-bold">{confirmedReg.utrNumber}</span>
+                </div>
+              )}
               <div className="flex justify-between border-b border-white/10 pb-2">
                 <span className="text-on-surface-variant">Phone:</span>
                 <span className="text-white font-mono">{confirmedReg.phoneNumber}</span>
@@ -182,6 +266,19 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
                 <span className="text-white font-mono">{confirmedReg.rollNumber}</span>
               </div>
             </div>
+
+            {/* Notice for Paid Pass Approval */}
+            {confirmedReg.passType === 'paid' && (
+              <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-left space-y-1.5">
+                <div className="flex items-center gap-1.5 text-amber-300 font-bold text-xs">
+                  <span className="material-symbols-outlined text-sm">info</span>
+                  <span>Instant Verification Notice</span>
+                </div>
+                <p className="text-[11px] text-amber-200/90 leading-relaxed font-code-sm">
+                  Our SDC coordinators will verify your UPI transaction ID with the club bank account and instantly issue your verified entry QR badge. You can view badge status under <strong>My Passes</strong> anytime!
+                </p>
+              </div>
+            )}
 
             {/* If Team Registration: Highlight Generated Team Code */}
             {confirmedReg.registrationType === 'team' && confirmedReg.teamCode && (
@@ -534,6 +631,141 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
                       </div>
                     )}
 
+                    {/* Pass Type Selector: Free vs Paid */}
+                    <div className="space-y-2 pt-1">
+                      <label className="block text-[11px] font-code-sm text-on-surface-variant uppercase flex justify-between">
+                        <span>Select Pass Type *</span>
+                        <span className="text-[10px] text-electric-cyan font-normal">0% Platform Fee (Direct UPI)</span>
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {/* Free Pass Option */}
+                        <div
+                          onClick={() => setPassType('free')}
+                          className={`p-3 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between ${
+                            passType === 'free'
+                              ? 'bg-white/[0.08] border-electric-cyan text-white shadow-[0_0_15px_rgba(14,165,233,0.25)] ring-1 ring-electric-cyan'
+                              : 'bg-white/[0.02] border-white/10 text-on-surface-variant hover:border-white/20'
+                          }`}
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="font-bold text-xs text-white">Free Pass</span>
+                            <span className="font-mono text-xs font-bold text-electric-cyan">₹0</span>
+                          </div>
+                          <p className="text-[10px] font-code-sm text-on-surface-variant leading-relaxed">
+                            Standard attendee access to live sessions and Q&A.
+                          </p>
+                        </div>
+
+                        {/* Paid Pass Option */}
+                        <div
+                          onClick={() => setPassType('paid')}
+                          className={`p-3 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between relative overflow-hidden ${
+                            passType === 'paid'
+                              ? 'bg-neon-purple/20 border-neon-purple text-white shadow-[0_0_20px_rgba(168,85,247,0.35)] ring-1 ring-neon-purple'
+                              : 'bg-white/[0.02] border-white/10 text-on-surface-variant hover:border-white/20'
+                          }`}
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-bold text-xs text-white">Paid Workshop Pass</span>
+                              <span className="text-[9px] bg-amber-400 text-black px-1.5 py-0.2 rounded font-bold uppercase">
+                                Recommended
+                              </span>
+                            </div>
+                            <span className="font-mono text-xs font-bold text-amber-300">₹{ticketPrice}</span>
+                          </div>
+                          <p className="text-[10px] font-code-sm text-on-surface-variant leading-relaxed">
+                            Full hands-on project kit, priority seating & certified workshop entry badge.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* If Paid Pass Selected: UPI Payment Widget */}
+                    {passType === 'paid' && (
+                      <div className="p-4 rounded-2xl bg-[#0e1628]/95 border border-neon-purple/40 space-y-3.5 shadow-lg animate-fadeIn">
+                        <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-neon-purple text-base">payments</span>
+                            <span className="font-bold text-white text-xs">Official SDC UPI Transfer</span>
+                          </div>
+                          <span className="font-mono font-bold text-amber-300 text-sm">₹{ticketPrice}.00</span>
+                        </div>
+
+                        {/* QR Code & Mobile Deep Link */}
+                        <div className="flex flex-col sm:flex-row items-center gap-4 bg-black/40 p-3.5 rounded-xl border border-white/10">
+                          <div className="bg-white p-2 rounded-xl shadow-md shrink-0 flex items-center justify-center">
+                            <QRCodeSVG
+                              value={upiDeepLink}
+                              size={110}
+                              level="M"
+                              includeMargin={false}
+                            />
+                          </div>
+                          <div className="space-y-2 text-center sm:text-left flex-1">
+                            <div className="text-[10px] font-code-sm text-on-surface-variant leading-relaxed">
+                              Scan with <strong className="text-white">Google Pay / PhonePe / Paytm / BHIM</strong>
+                            </div>
+
+                            {/* Mobile Deep Link Button */}
+                            <a
+                              href={upiDeepLink}
+                              className="inline-flex items-center justify-center gap-1.5 w-full py-2 px-3 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-xs font-bold font-code-sm hover:opacity-95 shadow-[0_0_12px_rgba(16,185,129,0.3)] transition-all"
+                            >
+                              <span className="material-symbols-outlined text-sm">open_in_new</span>
+                              <span>Pay with any UPI App</span>
+                            </a>
+
+                            {/* Copy UPI ID */}
+                            <div className="flex items-center justify-between bg-white/[0.04] px-2.5 py-1.5 rounded-lg border border-white/10 text-[11px] font-mono">
+                              <span className="text-white/80 truncate max-w-[150px] sm:max-w-[180px]">{upiId}</span>
+                              <button
+                                type="button"
+                                onClick={handleCopyUpi}
+                                className="text-electric-cyan hover:text-white transition-colors ml-2 font-code-sm text-[10px] shrink-0 font-bold"
+                              >
+                                {copiedUpi ? '✓ Copied' : 'Copy UPI'}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Step 2: 12-Digit UTR Input */}
+                        <div className="space-y-1.5">
+                          <label className="block text-[11px] font-code-sm text-amber-300 font-bold flex items-center justify-between">
+                            <span>Enter 12-Digit UPI Ref / UTR Number *</span>
+                            <span className="text-[9px] text-white/50 font-normal">Check transaction receipt</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            maxLength={22}
+                            placeholder="e.g. 428190348219"
+                            value={utrNumber}
+                            onChange={(e) => setUtrNumber(e.target.value.replace(/[^a-zA-Z0-9]/g, ''))}
+                            className="w-full bg-black/40 border border-amber-500/40 rounded-xl p-2.5 text-white font-mono placeholder-white/30 text-xs focus:outline-none focus:border-amber-400"
+                          />
+                          <p className="text-[10px] text-white/50 font-code-sm">
+                            💡 Found on your payment receipt under &quot;UPI Ref No.&quot; or &quot;UTR&quot;.
+                          </p>
+                        </div>
+
+                        {/* Optional Screenshot Upload */}
+                        <div className="pt-1 border-t border-white/10">
+                          <label className="block text-[10px] font-code-sm text-on-surface-variant mb-1 flex items-center justify-between">
+                            <span>Upload Payment Screenshot (Optional)</span>
+                            {paymentScreenshotUrl && <span className="text-emerald-400 font-bold">✓ Attached</span>}
+                          </label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleScreenshotChange}
+                            className="w-full text-xs font-code-sm text-on-surface-variant file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20 cursor-pointer"
+                          />
+                        </div>
+                      </div>
+                    )}
+
                     {/* Capacity status */}
                     <div className="flex justify-between items-center text-xs font-code-sm text-on-surface-variant pt-2 border-t border-white/10">
                       <span>Capacity Status:</span>
@@ -553,7 +785,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
                           <span>Registering & Generating Pass...</span>
                         ) : (
                           <>
-                            <span>Confirm Registration</span>
+                            <span>
+                              {passType === 'paid' ? `Submit Registration & UTR (₹${ticketPrice})` : 'Confirm Free Registration'}
+                            </span>
                             <span className="material-symbols-outlined text-sm">arrow_forward</span>
                           </>
                         )}

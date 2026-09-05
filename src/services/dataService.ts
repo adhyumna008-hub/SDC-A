@@ -508,6 +508,34 @@ export const subscribeAllRegistrationsService = (callback: (regs: EventRegistrat
   }
 };
 
+export const updateRegistrationPaymentStatusService = async (
+  regId: string,
+  paymentStatus: 'approved' | 'rejected'
+): Promise<boolean> => {
+  if (isFirebaseConfigured) {
+    try {
+      const regDocRef = doc(db, 'event_registrations', regId);
+      await updateDoc(regDocRef, {
+        paymentStatus,
+        status: paymentStatus === 'approved' ? 'confirmed' : 'cancelled'
+      });
+    } catch (e) {
+      console.warn('Firestore update payment status failed:', e);
+    }
+  }
+
+  // Update local storage
+  const regs = getLocalData<EventRegistration[]>(LOCAL_STORAGE_REGS, MOCK_USER_REGISTRATIONS);
+  const updatedRegs = regs.map(r => r.id === regId ? {
+    ...r,
+    paymentStatus,
+    status: (paymentStatus === 'approved' ? 'confirmed' : (paymentStatus === 'rejected' ? 'cancelled' : r.status)) as 'confirmed' | 'cancelled' | 'waitlisted'
+  } : r);
+  setLocalData(LOCAL_STORAGE_REGS, updatedRegs);
+  window.dispatchEvent(new Event('storage'));
+  return true;
+};
+
 export const checkInAttendeeByQRService = async (
   qrTokenOrId: string
 ): Promise<{ success: boolean; registration?: EventRegistration; message: string; alreadyCheckedIn?: boolean }> => {

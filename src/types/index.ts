@@ -48,6 +48,9 @@ export interface EventItem {
   hostingType?: 'in-house' | 'external';
   externalRegistrationUrl?: string;
   organizerName?: string;
+  feeType?: 'free' | 'paid';
+  ticketPrice?: number;
+  upiId?: string;
   createdAt?: any;
 }
 
@@ -69,6 +72,11 @@ export interface EventRegistration {
   teamCode?: string;
   teamName?: string;
   teamMembers?: { name: string; email: string; rollNumber: string }[];
+  passType?: 'free' | 'paid';
+  amountPaid?: number;
+  utrNumber?: string;
+  paymentScreenshotUrl?: string;
+  paymentStatus?: 'pending_review' | 'approved' | 'rejected' | 'free_verified';
   status: 'confirmed' | 'waitlisted' | 'cancelled';
   checkedIn: boolean;
   checkedInAt?: string;
