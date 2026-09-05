@@ -448,16 +448,12 @@ export const getUserRegistrationsService = (userId: string, callback: (regs: Eve
         regs.push({ id: docSnap.id, ...docSnap.data() } as EventRegistration);
       });
 
-      // Merge with any local registrations so offline or immediate creations are immediately reactive
-      const localRegs = getLocalData<EventRegistration[]>(LOCAL_STORAGE_REGS, MOCK_USER_REGISTRATIONS)
-        .filter(r => r.userId === userId);
-      const combined = [...regs];
-      localRegs.forEach(lr => {
-        if (!combined.some(c => c.id === lr.id || c.eventId === lr.eventId)) {
-          combined.push(lr);
-        }
-      });
-      callback(combined);
+      // Synchronize local storage cache so deleted registrations never resurrect locally
+      const allLocal = getLocalData<EventRegistration[]>(LOCAL_STORAGE_REGS, MOCK_USER_REGISTRATIONS);
+      const remainingOthers = allLocal.filter(r => r.userId !== userId);
+      setLocalData(LOCAL_STORAGE_REGS, [...remainingOthers, ...regs]);
+
+      callback(regs);
     }, (err) => {
       console.warn('User regs listener error', err);
       const allRegs = getLocalData<EventRegistration[]>(LOCAL_STORAGE_REGS, MOCK_USER_REGISTRATIONS);
@@ -481,9 +477,10 @@ export const getAllRegistrationsService = async (): Promise<EventRegistration[]>
       const snapshot = await getDocs(collection(db, 'event_registrations'));
       const regs: EventRegistration[] = [];
       snapshot.forEach(docSnap => regs.push({ id: docSnap.id, ...docSnap.data() } as EventRegistration));
+      setLocalData(LOCAL_STORAGE_REGS, regs);
       return regs;
     } catch (e) {
-      console.warn('Fetch all registrations failed', e);
+      console.warn('Failed to fetch registrations from Firestore', e);
     }
   }
   return getLocalData<EventRegistration[]>(LOCAL_STORAGE_REGS, MOCK_USER_REGISTRATIONS);
@@ -495,6 +492,7 @@ export const subscribeAllRegistrationsService = (callback: (regs: EventRegistrat
     return onSnapshot(q, (snapshot) => {
       const regs: EventRegistration[] = [];
       snapshot.forEach(docSnap => regs.push({ id: docSnap.id, ...docSnap.data() } as EventRegistration));
+      setLocalData(LOCAL_STORAGE_REGS, regs);
       callback(regs);
     }, (err) => {
       console.warn('Realtime all registrations listener error', err);

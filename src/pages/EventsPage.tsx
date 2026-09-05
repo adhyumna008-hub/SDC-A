@@ -305,9 +305,10 @@ export const EventsPage: React.FC = () => {
                       ) : (
                         <button
                           onClick={() => setRegisteringEvent(evt)}
-                          className="font-label-caps text-xs px-5 py-2.5 rounded-xl bg-gradient-to-r from-neon-purple to-electric-cyan text-white hover:opacity-95 transition-all shadow-[0_0_15px_rgba(168,85,247,0.4)] uppercase font-bold border border-white/20"
+                          className="font-label-caps text-xs px-5 py-2.5 rounded-xl bg-gradient-to-r from-neon-purple to-electric-cyan text-white hover:opacity-95 transition-all shadow-[0_0_15px_rgba(168,85,247,0.4)] uppercase font-bold border border-white/20 flex items-center gap-1.5 cursor-pointer"
                         >
-                          Register
+                          <span>{evt.feeType === 'paid' ? `Register • ₹${evt.ticketPrice || 99}` : 'Register'}</span>
+                          <span className="material-symbols-outlined text-sm">arrow_forward</span>
                         </button>
                       )}
                     </div>

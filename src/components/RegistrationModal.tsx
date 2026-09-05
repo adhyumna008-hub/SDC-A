@@ -631,58 +631,34 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
                       </div>
                     )}
 
-                    {/* Pass Type Selector: Free vs Paid */}
+                    {/* Pass Type Header */}
                     <div className="space-y-2 pt-1">
-                      <label className="block text-[11px] font-code-sm text-on-surface-variant uppercase flex justify-between">
-                        <span>Select Pass Type *</span>
-                        <span className="text-[10px] text-electric-cyan font-normal">0% Platform Fee (Direct UPI)</span>
-                      </label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                        {/* Free Pass Option */}
-                        <div
-                          onClick={() => setPassType('free')}
-                          className={`p-3 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between ${
-                            passType === 'free'
-                              ? 'bg-white/[0.08] border-electric-cyan text-white shadow-[0_0_15px_rgba(14,165,233,0.25)] ring-1 ring-electric-cyan'
-                              : 'bg-white/[0.02] border-white/10 text-on-surface-variant hover:border-white/20'
-                          }`}
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            <span className="font-bold text-xs text-white">Free Pass</span>
-                            <span className="font-mono text-xs font-bold text-electric-cyan">₹0</span>
-                          </div>
-                          <p className="text-[10px] font-code-sm text-on-surface-variant leading-relaxed">
-                            Standard attendee access to live sessions and Q&A.
-                          </p>
-                        </div>
-
-                        {/* Paid Pass Option */}
-                        <div
-                          onClick={() => setPassType('paid')}
-                          className={`p-3 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between relative overflow-hidden ${
-                            passType === 'paid'
-                              ? 'bg-neon-purple/20 border-neon-purple text-white shadow-[0_0_20px_rgba(168,85,247,0.35)] ring-1 ring-neon-purple'
-                              : 'bg-white/[0.02] border-white/10 text-on-surface-variant hover:border-white/20'
-                          }`}
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-bold text-xs text-white">Paid Workshop Pass</span>
-                              <span className="text-[9px] bg-amber-400 text-black px-1.5 py-0.2 rounded font-bold uppercase">
-                                Recommended
-                              </span>
+                      {isPaidEvent ? (
+                        <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-neon-purple/15 to-electric-cyan/15 border border-amber-500/40 space-y-1 relative overflow-hidden shadow-lg">
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                              <span className="material-symbols-outlined text-amber-400 text-lg">workspace_premium</span>
+                              <span className="font-headline-lg font-bold text-sm text-white">Paid Workshop Pass</span>
                             </div>
-                            <span className="font-mono text-xs font-bold text-amber-300">₹{ticketPrice}</span>
+                            <span className="font-mono text-lg font-extrabold text-amber-300">₹{ticketPrice}</span>
                           </div>
-                          <p className="text-[10px] font-code-sm text-on-surface-variant leading-relaxed">
-                            Full hands-on project kit, priority seating & certified workshop entry badge.
+                          <p className="text-[11px] text-white/80 font-code-sm leading-relaxed">
+                            Official ticket for <strong>{event.title}</strong>. Includes hands-on project kit, verified certificate badge, and direct seat reservation.
                           </p>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 flex justify-between items-center">
+                          <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-electric-cyan text-base">confirmation_number</span>
+                            <span className="font-headline-lg font-bold text-xs text-white">Free Entry Pass</span>
+                          </div>
+                          <span className="font-mono text-xs font-bold text-electric-cyan">₹0</span>
+                        </div>
+                      )}
                     </div>
 
-                    {/* If Paid Pass Selected: UPI Payment Widget */}
-                    {passType === 'paid' && (
+                    {/* If Paid Event: UPI Payment Widget */}
+                    {isPaidEvent && (
                       <div className="p-4 rounded-2xl bg-[#0e1628]/95 border border-neon-purple/40 space-y-3.5 shadow-lg animate-fadeIn">
                         <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
                           <div className="flex items-center gap-2">
