@@ -119,7 +119,7 @@ export const LandingPage: React.FC = () => {
           </button>
         </div>
 
-        {/* Interactive Tech Node Cluster (Inspired by GCore Pin 1) */}
+        {/* Core Leadership Node Cluster around SDC CORE */}
         <div className="w-full max-w-4xl relative py-8 px-4 flex flex-col items-center">
           
           {/* Circuit SVG Lines linking nodes */}
@@ -130,7 +130,7 @@ export const LandingPage: React.FC = () => {
             
             {/* Center to Right traces */}
             <path d="M 430 120 L 480 50 L 640 50" stroke="rgba(14, 165, 233, 0.4)" strokeWidth="1.5" className="circuit-pulse" />
-            <path d="M 430 120 L 480 190 L 640 190" stroke="rgba(168, 85, 247, 0.4)" strokeWidth="1.5" className="circuit-pulse" />
+            <path d="M 430 120 L 480 190 L 640 190" stroke="rgba(16, 185, 129, 0.4)" strokeWidth="1.5" className="circuit-pulse" />
             <path d="M 400 160 L 400 230" stroke="rgba(255, 255, 255, 0.2)" strokeWidth="1.5" strokeDasharray="4 4" />
           </svg>
 
@@ -139,28 +139,48 @@ export const LandingPage: React.FC = () => {
             
             {/* Left Satellite Nodes */}
             <div className="flex flex-col gap-5 items-center sm:items-end">
-              {/* Node 1: AI / Machine Learning */}
-              <div className="soft-ui-chip rounded-2xl p-4 w-60 text-left border border-white/10 hover:border-amber-500/50 transition-all group hover:-translate-y-1">
+              {/* Node 1: President */}
+              <div className="soft-ui-chip rounded-2xl p-3.5 w-64 text-left border border-white/10 hover:border-amber-500/50 transition-all group hover:-translate-y-1 backdrop-blur-xl shadow-soft-ui">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-ember-amber/15 border border-ember-amber/30 flex items-center justify-center text-ember-amber shadow-sm">
-                    <span className="material-symbols-outlined text-lg">neurology</span>
+                  <div className="relative w-12 h-12 rounded-2xl overflow-hidden bg-ember-amber/15 border border-amber-500/40 shrink-0 shadow-[0_0_12px_rgba(249,115,22,0.3)] flex items-center justify-center">
+                    <img 
+                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" 
+                      alt="President, SDC" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
                   </div>
-                  <div>
-                    <h4 className="text-white font-bold text-sm group-hover:text-ember-amber transition-colors">AI & Deep Learning</h4>
-                    <p className="text-[11px] text-white/50 mono">LLMs • PyTorch • Vision</p>
+                  <div className="overflow-hidden">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className="font-label-caps text-[9px] uppercase tracking-wider text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-500/40 font-bold">
+                        PRESIDENT
+                      </span>
+                    </div>
+                    <h4 className="text-white font-bold text-sm truncate group-hover:text-amber-400 transition-colors">President</h4>
+                    <p className="text-[11px] text-white/50 mono truncate">Club Leadership & Vision</p>
                   </div>
                 </div>
               </div>
 
-              {/* Node 2: Cybersecurity & Cryptography */}
-              <div className="soft-ui-chip rounded-2xl p-4 w-60 text-left border border-white/10 hover:border-neon-purple/50 transition-all group hover:-translate-y-1">
+              {/* Node 2: Vice President */}
+              <div className="soft-ui-chip rounded-2xl p-3.5 w-64 text-left border border-white/10 hover:border-neon-purple/50 transition-all group hover:-translate-y-1 backdrop-blur-xl shadow-soft-ui">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-neon-purple/15 border border-neon-purple/30 flex items-center justify-center text-neon-purple shadow-sm">
-                    <span className="material-symbols-outlined text-lg">shield</span>
+                  <div className="relative w-12 h-12 rounded-2xl overflow-hidden bg-neon-purple/15 border border-neon-purple/40 shrink-0 shadow-[0_0_12px_rgba(168,85,247,0.3)] flex items-center justify-center">
+                    <img 
+                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80" 
+                      alt="Vice President, SDC" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
                   </div>
-                  <div>
-                    <h4 className="text-white font-bold text-sm group-hover:text-neon-purple transition-colors">Cybersecurity</h4>
-                    <p className="text-[11px] text-white/50 mono">CTFs • Network Security</p>
+                  <div className="overflow-hidden">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className="font-label-caps text-[9px] uppercase tracking-wider text-neon-purple bg-neon-purple/20 px-2 py-0.5 rounded-full border border-neon-purple/40 font-bold">
+                        VICE PRESIDENT
+                      </span>
+                    </div>
+                    <h4 className="text-white font-bold text-sm truncate group-hover:text-neon-purple transition-colors">Vice President</h4>
+                    <p className="text-[11px] text-white/50 mono truncate">Operations & Strategy</p>
                   </div>
                 </div>
               </div>
@@ -186,28 +206,48 @@ export const LandingPage: React.FC = () => {
 
             {/* Right Satellite Nodes */}
             <div className="flex flex-col gap-5 items-center sm:items-start">
-              {/* Node 3: Cloud & Distributed Systems */}
-              <div className="soft-ui-chip rounded-2xl p-4 w-60 text-left border border-white/10 hover:border-electric-cyan/50 transition-all group hover:-translate-y-1">
+              {/* Node 3: Secretary */}
+              <div className="soft-ui-chip rounded-2xl p-3.5 w-64 text-left border border-white/10 hover:border-electric-cyan/50 transition-all group hover:-translate-y-1 backdrop-blur-xl shadow-soft-ui">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-electric-cyan/15 border border-electric-cyan/30 flex items-center justify-center text-electric-cyan shadow-sm">
-                    <span className="material-symbols-outlined text-lg">cloud</span>
+                  <div className="relative w-12 h-12 rounded-2xl overflow-hidden bg-electric-cyan/15 border border-electric-cyan/40 shrink-0 shadow-[0_0_12px_rgba(14,165,233,0.3)] flex items-center justify-center">
+                    <img 
+                      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&q=80" 
+                      alt="Secretary, SDC" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
                   </div>
-                  <div>
-                    <h4 className="text-white font-bold text-sm group-hover:text-electric-cyan transition-colors">Cloud & DevOps</h4>
-                    <p className="text-[11px] text-white/50 mono">Kubernetes • Docker • Go</p>
+                  <div className="overflow-hidden">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className="font-label-caps text-[9px] uppercase tracking-wider text-electric-cyan bg-electric-cyan/20 px-2 py-0.5 rounded-full border border-electric-cyan/40 font-bold">
+                        SECRETARY
+                      </span>
+                    </div>
+                    <h4 className="text-white font-bold text-sm truncate group-hover:text-electric-cyan transition-colors">General Secretary</h4>
+                    <p className="text-[11px] text-white/50 mono truncate">Campus Outreach & Comm</p>
                   </div>
                 </div>
               </div>
 
-              {/* Node 4: Open Source & Full Stack */}
-              <div className="soft-ui-chip rounded-2xl p-4 w-60 text-left border border-white/10 hover:border-neon-purple/50 transition-all group hover:-translate-y-1">
+              {/* Node 4: Joint Secretary */}
+              <div className="soft-ui-chip rounded-2xl p-3.5 w-64 text-left border border-white/10 hover:border-emerald-500/50 transition-all group hover:-translate-y-1 backdrop-blur-xl shadow-soft-ui">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-neon-purple/15 border border-neon-purple/30 flex items-center justify-center text-neon-purple shadow-sm">
-                    <span className="material-symbols-outlined text-lg">code_blocks</span>
+                  <div className="relative w-12 h-12 rounded-2xl overflow-hidden bg-emerald-500/15 border border-emerald-500/40 shrink-0 shadow-[0_0_12px_rgba(34,197,94,0.3)] flex items-center justify-center">
+                    <img 
+                      src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80" 
+                      alt="Joint Secretary, SDC" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
                   </div>
-                  <div>
-                    <h4 className="text-white font-bold text-sm group-hover:text-neon-purple transition-colors">Open Source</h4>
-                    <p className="text-[11px] text-white/50 mono">React • Rust • Python</p>
+                  <div className="overflow-hidden">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <span className="font-label-caps text-[9px] uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/40 font-bold">
+                        JOINT SECRETARY
+                      </span>
+                    </div>
+                    <h4 className="text-white font-bold text-sm truncate group-hover:text-emerald-400 transition-colors">Joint Secretary</h4>
+                    <p className="text-[11px] text-white/50 mono truncate">Event Logistics & Media</p>
                   </div>
                 </div>
               </div>
