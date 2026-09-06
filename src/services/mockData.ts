@@ -2,28 +2,6 @@ import { EventItem, IdeaHubRequest, Opportunity, SystemAnnouncement, EventRegist
 
 export const INITIAL_EVENTS: EventItem[] = [
   {
-    id: 'evt-ai-civil-2026',
-    title: 'AI in Civil Engineering',
-    description: 'Harnessing AI to design, build & transform the future. Interactive workshop covering AI for Structural Analysis & Design, Smart Construction & Automation, Data-Driven Decision Making, and Sustainable & Resilient Infrastructure. Organized by Student Developers Club (SDC), Vardhaman College of Engineering. Contacts: Mani (+91 91216 48949) | Adhyumna (+91 93478 90012).',
-    category: 'workshop',
-    status: 'open',
-    image: '/events/ai-in-civil-engineering.jpg',
-    date: 'September 17, 2026',
-    location: 'Vardhaman College of Engineering',
-    registration_start_time: '2026-08-01T00:00:00.000Z',
-    registration_end_time: '2026-09-17T09:00:00.000Z',
-    is_inter_college: true,
-    min_team_size: 1,
-    max_team_size: 1,
-    max_seats: 150,
-    registered_count: 0,
-    attendance_count: 0,
-    feeType: 'paid',
-    ticketPrice: 99,
-    upiId: 'sdcvce@okhdfcbank',
-    createdAt: '2026-08-29T05:08:25.553Z'
-  },
-  {
     id: 'evt-github-workshop-2025',
     title: 'Git & GitHub Hands-on Workshop',
     description: 'Conducted by previous SDC leads to equip students with core version control fundamentals: repository management, branching workflows, pull requests, resolving merge conflicts, and contributing to open source.',

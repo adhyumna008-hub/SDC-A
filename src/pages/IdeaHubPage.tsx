@@ -94,7 +94,7 @@ export const IdeaHubPage: React.FC = () => {
     : activeIdeas.filter(i => i.category.toLowerCase() === selectedCategory.toLowerCase());
 
   return (
-    <main className="flex-grow pt-[68px] pb-section-gap px-container-padding w-full max-w-7xl mx-auto flex flex-col relative z-10">
+    <main className="flex-grow pt-4 sm:pt-6 pb-section-gap px-container-padding w-full max-w-7xl mx-auto flex flex-col relative z-10">
       {/* Header Banner */}
       <header className="relative mb-6 p-6 md:p-8 rounded-3xl backdrop-blur-2xl bg-[#090d1a]/85 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden">
         {/* Specular Sheen */}

@@ -59,7 +59,7 @@ export const EventsPage: React.FC = () => {
   };
 
   return (
-    <main className="flex-grow pt-[68px] pb-section-gap px-container-padding w-full max-w-7xl mx-auto flex flex-col relative z-10">
+    <main className="flex-grow pt-4 sm:pt-6 pb-section-gap px-container-padding w-full max-w-7xl mx-auto flex flex-col relative z-10">
       {/* Header Section */}
       <header className="relative mb-6 p-8 md:p-10 rounded-3xl backdrop-blur-2xl bg-[#090d1a]/85 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-28 bg-gradient-to-b from-white/[0.08] to-transparent pointer-events-none rounded-t-3xl"></div>

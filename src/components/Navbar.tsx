@@ -20,8 +20,8 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 pt-2.5 sm:pt-4 px-3 sm:px-6 md:px-8 w-full flex flex-col items-center pointer-events-none transition-all duration-300">
-      <div className="w-full max-w-7xl backdrop-blur-2xl bg-[#090b16]/80 border border-white/10 rounded-full px-4 sm:px-6 py-2.5 shadow-[0_12px_40px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.12)] flex justify-between items-center pointer-events-auto">
+    <header className="sticky top-0 z-50 w-full flex flex-col items-center pointer-events-none transition-all duration-300 bg-gradient-to-b from-deep-black via-deep-black/90 to-transparent pt-2.5 sm:pt-3.5 pb-4 px-3 sm:px-6 md:px-8">
+      <div className="w-full max-w-7xl backdrop-blur-2xl bg-[#090e1d] border border-white/15 rounded-full px-4 sm:px-6 py-2.5 shadow-[0_16px_45px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(255,255,255,0.12)] flex justify-between items-center pointer-events-auto">
         {/* Brand */}
         <Link 
           to="/" 

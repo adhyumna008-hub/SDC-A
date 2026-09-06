@@ -81,6 +81,18 @@ export const getEventsService = async (): Promise<EventItem[]> => {
   return getLocalData<EventItem[]>(LOCAL_STORAGE_EVENTS, INITIAL_EVENTS);
 };
 
+// Clean up legacy localStorage mock events that duplicated Firestore events
+if (typeof window !== 'undefined' && isFirebaseConfigured) {
+  try {
+    const cached = localStorage.getItem(LOCAL_STORAGE_EVENTS);
+    if (cached && (cached.includes('evt-ai-civil') || cached.includes('AI in Civil Engineering'))) {
+      localStorage.removeItem(LOCAL_STORAGE_EVENTS);
+    }
+  } catch (e) {
+    // Ignore in SSR
+  }
+}
+
 export const subscribeEventsService = (callback: (events: EventItem[]) => void) => {
   if (isFirebaseConfigured) {
     const q = query(collection(db, 'events'), orderBy('createdAt', 'desc'));
@@ -89,15 +101,7 @@ export const subscribeEventsService = (callback: (events: EventItem[]) => void) 
       snapshot.forEach((docSnap) => {
         events.push({ id: docSnap.id, ...docSnap.data() } as EventItem);
       });
-      // Merge with any locally created events
-      const localEvents = getLocalData<EventItem[]>(LOCAL_STORAGE_EVENTS, INITIAL_EVENTS);
-      const combined = [...events];
-      localEvents.forEach(le => {
-        if (!combined.some(c => c.id === le.id)) {
-          combined.push(le);
-        }
-      });
-      callback(combined);
+      callback(events);
     }, (error) => {
       console.warn('Realtime events listener error', error);
       callback(getLocalData<EventItem[]>(LOCAL_STORAGE_EVENTS, INITIAL_EVENTS));

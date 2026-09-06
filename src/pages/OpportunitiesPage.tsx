@@ -30,7 +30,7 @@ export const OpportunitiesPage: React.FC = () => {
   };
 
   return (
-    <main className="flex-grow z-10 w-full max-w-7xl mx-auto px-container-padding pt-[68px] pb-12 flex flex-col gap-12 relative">
+    <main className="flex-grow z-10 w-full max-w-7xl mx-auto px-container-padding pt-4 sm:pt-6 pb-12 flex flex-col gap-12 relative">
       {/* Header Section */}
       <header className="relative p-6 md:p-8 rounded-3xl backdrop-blur-2xl bg-[#090d1a]/85 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-28 bg-gradient-to-b from-white/[0.08] to-transparent pointer-events-none rounded-t-3xl"></div>
