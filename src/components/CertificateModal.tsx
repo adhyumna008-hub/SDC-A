@@ -20,7 +20,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({ event, regis
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-deep-black/80 backdrop-blur-md animate-fadeIn">
-      <div className="bg-surface-gray border border-outline-variant/30 rounded-2xl max-w-3xl w-full p-6 md:p-8 relative shadow-2xl overflow-hidden flex flex-col gap-6">
+      <div className="bg-surface-gray border border-outline-variant/30 rounded-2xl max-w-3xl w-full p-6 md:p-8 relative shadow-2xl overflow-hidden flex flex-col gap-6 animate-scaleIn">
         {/* Top Header */}
         <div className="flex justify-between items-center border-b border-outline-variant/20 pb-4">
           <div className="flex items-center gap-2 text-neon-purple font-headline-lg font-bold">

@@ -155,7 +155,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       <div className="fixed bottom-1/4 right-1/3 w-80 h-80 bg-electric-cyan/20 rounded-full blur-[120px] pointer-events-none -z-10"></div>
 
       {/* Modal Container */}
-      <div className="relative my-auto max-h-[90vh] overflow-y-auto max-w-md w-full rounded-3xl p-6 sm:p-8 flex flex-col gap-5 text-on-surface shadow-soft-ui-lg bg-gradient-to-b from-[#131b2e]/95 via-[#0b1326]/95 to-[#060e20]/95 backdrop-blur-3xl border border-white/20 ring-1 ring-neon-purple/30 no-scrollbar">
+      <div className="relative my-auto max-h-[90vh] overflow-y-auto max-w-md w-full rounded-3xl p-6 sm:p-8 flex flex-col gap-5 text-on-surface shadow-soft-ui-lg bg-gradient-to-b from-[#131b2e]/95 via-[#0b1326]/95 to-[#060e20]/95 backdrop-blur-3xl border border-white/20 ring-1 ring-neon-purple/30 no-scrollbar animate-scaleIn">
         
         {/* Top Specular Sheen */}
         <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white/[0.12] to-transparent pointer-events-none rounded-t-3xl"></div>

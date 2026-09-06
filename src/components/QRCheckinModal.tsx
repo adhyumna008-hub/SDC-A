@@ -139,7 +139,7 @@ export const QRCheckinModal: React.FC<QRCheckinModalProps> = ({ onClose, onCheck
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-deep-black/85 backdrop-blur-xl animate-fadeIn">
-      <div className="bg-[#0b1326] border border-white/20 rounded-3xl max-w-lg w-full p-6 sm:p-7 relative shadow-[0_20px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col gap-5 text-on-surface">
+      <div className="bg-[#0b1326] border border-white/20 rounded-3xl max-w-lg w-full p-6 sm:p-7 relative shadow-[0_20px_60px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col gap-5 text-on-surface animate-scaleIn">
         
         {/* Specular Liquid Edge */}
         <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white/[0.1] to-transparent pointer-events-none rounded-t-3xl"></div>

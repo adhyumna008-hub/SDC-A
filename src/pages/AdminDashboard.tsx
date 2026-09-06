@@ -1679,7 +1679,7 @@ export const AdminDashboard: React.FC = () => {
       {/* New Event Modal */}
       {showNewEventModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-deep-black/80 backdrop-blur-md animate-fadeIn">
-          <div className="bg-surface-gray border border-outline-variant/30 rounded-2xl max-w-xl w-full p-6 relative shadow-2xl overflow-y-auto max-h-[90vh]">
+          <div className="bg-surface-gray border border-outline-variant/30 rounded-2xl max-w-xl w-full p-6 relative shadow-2xl overflow-y-auto max-h-[90vh] animate-scaleIn">
             <div className="flex justify-between items-center border-b border-outline-variant/20 pb-3 mb-4">
               <h3 className="font-headline-lg text-lg font-bold text-white flex items-center gap-2">
                 <span className="material-symbols-outlined text-neon-purple">add_circle</span>
@@ -1897,7 +1897,7 @@ export const AdminDashboard: React.FC = () => {
       {/* New Opportunity Modal */}
       {showNewOppModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-deep-black/80 backdrop-blur-md animate-fadeIn">
-          <div className="bg-surface-gray border border-outline-variant/30 rounded-2xl max-w-lg w-full p-6 relative shadow-2xl">
+          <div className="bg-surface-gray border border-outline-variant/30 rounded-2xl max-w-lg w-full p-6 relative shadow-2xl animate-scaleIn">
             <div className="flex justify-between items-center border-b border-outline-variant/20 pb-3 mb-4">
               <h3 className="font-headline-lg text-lg font-bold text-white flex items-center gap-2">
                 <span className="material-symbols-outlined text-electric-cyan">hub</span>
@@ -2030,7 +2030,7 @@ export const AdminDashboard: React.FC = () => {
 
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-deep-black/85 backdrop-blur-xl animate-fadeIn">
-            <div className="bg-[#0b1326] border border-white/20 rounded-3xl max-w-4xl w-full p-4 sm:p-5 relative shadow-2xl space-y-3 max-h-[90vh] flex flex-col">
+            <div className="bg-[#0b1326] border border-white/20 rounded-3xl max-w-4xl w-full p-4 sm:p-5 relative shadow-2xl space-y-3 max-h-[90vh] flex flex-col animate-scaleIn">
               
               {/* Header */}
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/10 pb-4">
@@ -2331,7 +2331,7 @@ export const AdminDashboard: React.FC = () => {
       {/* Payment Screenshot Modal */}
       {viewingScreenshotUrl && (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 bg-deep-black/90 backdrop-blur-xl animate-fadeIn">
-          <div className="bg-[#0b1326] border border-white/20 rounded-3xl max-w-lg w-full p-5 relative shadow-2xl space-y-4">
+          <div className="bg-[#0b1326] border border-white/20 rounded-3xl max-w-lg w-full p-5 relative shadow-2xl space-y-4 animate-scaleIn">
             <div className="flex justify-between items-center border-b border-white/10 pb-3">
               <h4 className="text-white font-bold text-sm flex items-center gap-2">
                 <span className="material-symbols-outlined text-electric-cyan">receipt_long</span>

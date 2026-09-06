@@ -200,7 +200,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
       {/* Ambient Glow */}
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-neon-purple/20 rounded-full blur-[120px] pointer-events-none -z-10"></div>
 
-      <div className="relative my-auto max-h-[92vh] overflow-y-auto max-w-lg w-full rounded-3xl p-6 sm:p-8 flex flex-col gap-5 text-on-surface shadow-[0_20px_60px_rgba(0,0,0,0.9),0_0_40px_rgba(168,85,247,0.2),inset_0_1px_2px_rgba(255,255,255,0.3)] bg-gradient-to-b from-[#131b2e]/95 via-[#0b1326]/95 to-[#060e20]/95 backdrop-blur-3xl border border-white/20 ring-1 ring-neon-purple/30">
+      <div className="relative my-auto max-h-[92vh] overflow-y-auto max-w-lg w-full rounded-3xl p-6 sm:p-8 flex flex-col gap-5 text-on-surface shadow-[0_20px_60px_rgba(0,0,0,0.9),0_0_40px_rgba(168,85,247,0.2),inset_0_1px_2px_rgba(255,255,255,0.3)] bg-gradient-to-b from-[#131b2e]/95 via-[#0b1326]/95 to-[#060e20]/95 backdrop-blur-3xl border border-white/20 ring-1 ring-neon-purple/30 animate-scaleIn">
         {/* Top Specular Sheen */}
         <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-white/[0.12] to-transparent pointer-events-none rounded-t-3xl"></div>
 

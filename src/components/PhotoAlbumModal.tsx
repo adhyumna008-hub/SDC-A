@@ -35,7 +35,7 @@ export const PhotoAlbumModal: React.FC<PhotoAlbumModalProps> = ({ event, initial
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-deep-black/90 backdrop-blur-2xl animate-fadeIn">
-      <div className="relative max-w-5xl w-full h-[90vh] flex flex-col justify-between bg-[#0b1326]/95 border border-white/20 rounded-3xl p-5 sm:p-8 shadow-2xl overflow-hidden">
+      <div className="relative max-w-5xl w-full h-[90vh] flex flex-col justify-between bg-[#0b1326]/95 border border-white/20 rounded-3xl p-5 sm:p-8 shadow-2xl overflow-hidden animate-scaleIn">
         
         {/* Modal Header */}
         <div className="flex justify-between items-center pb-4 border-b border-white/10 relative z-10">
