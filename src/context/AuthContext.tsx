@@ -21,7 +21,7 @@ interface AuthContextType {
   isDemoMode: boolean;
   signInWithGoogle: () => Promise<void>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
-  signUpWithEmail: (email: string, pass: string, name: string, college?: string, roll?: string) => Promise<void>;
+  signUpWithEmail: (email: string, pass: string, name: string, college?: string, roll?: string) => Promise<{ isNewUser: boolean; emailVerified: boolean }>;
   resendVerificationEmail: () => Promise<void>;
   checkEmailVerification: () => Promise<boolean>;
   signOutUser: () => Promise<void>;
@@ -82,7 +82,13 @@ export const determineRoleFromEmail = (email: string): UserRole => {
   if (!email) return 'guest';
   const cleanEmail = email.toLowerCase().trim();
   if (ADMIN_WHITELIST.includes(cleanEmail)) return 'admin';
-  if (cleanEmail.endsWith(`@${INTERNAL_COLLEGE_DOMAIN}`)) return 'member';
+  if (
+    cleanEmail.endsWith(`@${INTERNAL_COLLEGE_DOMAIN}`) ||
+    cleanEmail.endsWith(`@student.${INTERNAL_COLLEGE_DOMAIN}`) ||
+    cleanEmail.endsWith(`.${INTERNAL_COLLEGE_DOMAIN}`)
+  ) {
+    return 'member';
+  }
   return 'guest';
 };
 
@@ -209,7 +215,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signUpWithEmail = async (email: string, pass: string, name: string, college?: string, roll?: string) => {
+  const signUpWithEmail = async (
+    email: string, 
+    pass: string, 
+    name: string, 
+    college?: string, 
+    roll?: string
+  ): Promise<{ isNewUser: boolean; emailVerified: boolean }> => {
     const cleanEmail = email.trim();
     const cleanName = (name || cleanEmail.split('@')[0]).trim();
     const cleanRoll = roll && !isDummyRoll(roll) ? roll.trim().toUpperCase() : '';
@@ -217,33 +229,55 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const res = await createUserWithEmailAndPassword(auth, cleanEmail, pass);
         if (res.user) {
-          try {
-            await updateProfile(res.user, { displayName: cleanName });
-          } catch (profileErr) {
+          // Asynchronously update displayName without blocking UI transition
+          updateProfile(res.user, { displayName: cleanName }).catch((profileErr) => {
             console.warn('Profile update warning:', profileErr);
-          }
+          });
 
-          // Dispatches official verification link to email on first-time account creation
-          try {
-            await sendEmailVerification(res.user, {
-              url: window.location.origin,
-              handleCodeInApp: false
-            });
-            console.log('Official email verification link dispatched to:', cleanEmail);
-          } catch (verifErr) {
-            console.warn('Could not dispatch verification email:', verifErr);
-          }
+          // Dispatch verification email in background; never block user UI transition
+          const sendVerification = async (u: FirebaseUser) => {
+            try {
+              // Standard call works robustly across all domains & environments
+              await sendEmailVerification(u);
+              console.log('Standard email verification dispatched to:', cleanEmail);
+            } catch (verifErr: any) {
+              console.warn('Standard verification send note, attempting with origin:', verifErr?.message);
+              try {
+                await sendEmailVerification(u, {
+                  url: window.location.origin,
+                  handleCodeInApp: false
+                });
+                console.log('Email verification with origin dispatched to:', cleanEmail);
+              } catch (secondErr: any) {
+                console.warn('Could not dispatch verification email:', secondErr?.message);
+              }
+            }
+          };
 
+          sendVerification(res.user);
           setUser(mapFirebaseUser(res.user, { collegeName: college, rollNumber: cleanRoll }));
+          return { isNewUser: true, emailVerified: false };
         }
+        return { isNewUser: true, emailVerified: false };
       } catch (err: any) {
-        // If email already exists, gracefully sign in with the provided password!
+        // If email already exists, gracefully attempt direct sign-in with the provided password!
         if (err.code === 'auth/email-already-in-use') {
           console.log('Account already exists. Attempting direct sign-in...');
-          const signRes = await signInWithEmailAndPassword(auth, cleanEmail, pass);
-          if (signRes.user) {
-            setUser(mapFirebaseUser(signRes.user, { collegeName: college, rollNumber: cleanRoll }));
-            return;
+          try {
+            const signRes = await signInWithEmailAndPassword(auth, cleanEmail, pass);
+            if (signRes.user) {
+              setUser(mapFirebaseUser(signRes.user, { collegeName: college, rollNumber: cleanRoll }));
+              if (!signRes.user.emailVerified) {
+                sendEmailVerification(signRes.user).catch((e) => {
+                  console.warn('Background verification dispatch note:', e?.message);
+                });
+              }
+              return { isNewUser: false, emailVerified: signRes.user.emailVerified };
+            }
+          } catch (signInErr: any) {
+            const customErr: any = new Error('This email is already registered. Please switch to Sign In or enter the correct password.');
+            customErr.code = 'auth/email-already-in-use';
+            throw customErr;
           }
         }
         throw err;
@@ -261,27 +295,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         emailVerified: true
       });
       setIsDemoMode(true);
+      return { isNewUser: true, emailVerified: true };
     }
   };
 
   const resendVerificationEmail = async () => {
     if (isFirebaseConfigured && auth.currentUser) {
-      await sendEmailVerification(auth.currentUser, {
-        url: window.location.origin,
-        handleCodeInApp: false
-      });
-      console.log('Verification link re-sent to:', auth.currentUser.email);
+      const u = auth.currentUser;
+      const sendPromise = (async () => {
+        try {
+          await sendEmailVerification(u);
+        } catch (e) {
+          await sendEmailVerification(u, {
+            url: window.location.origin,
+            handleCodeInApp: false
+          });
+        }
+      })();
+
+      // Cap wait time to 3 seconds max so UI never freezes
+      await Promise.race([
+        sendPromise,
+        new Promise((resolve) => setTimeout(resolve, 3000))
+      ]);
+      console.log('Verification link re-sent request initiated for:', auth.currentUser.email);
     }
   };
 
   const checkEmailVerification = async (): Promise<boolean> => {
     if (isFirebaseConfigured && auth.currentUser) {
-      await auth.currentUser.reload();
-      const verified = auth.currentUser.emailVerified;
-      if (verified && user) {
-        setUser({ ...user, emailVerified: true });
+      try {
+        await Promise.race([
+          auth.currentUser.reload(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Reload timeout')), 4000))
+        ]);
+        const verified = auth.currentUser.emailVerified;
+        if (verified && user) {
+          setUser({ ...user, emailVerified: true });
+        }
+        return verified;
+      } catch (err) {
+        console.warn('Reload check error:', err);
+        return auth.currentUser.emailVerified;
       }
-      return verified;
     }
     return true;
   };

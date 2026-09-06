@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../context/AuthContext';
+import { auth } from '../config/firebase';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -34,7 +35,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [isVerifiedSuccess, setIsVerifiedSuccess] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
-  // Auto-close modal whenever user is successfully authenticated (and verified, or via Google)
+  // Open directly to email verification screen if user is already logged in but unverified
+  React.useEffect(() => {
+    if (isOpen) {
+      if (user && !user.emailVerified) {
+        if (user.email) setEmail(user.email);
+        setVerificationPending(true);
+      } else if (!user) {
+        setVerificationPending(false);
+      }
+    }
+  }, [isOpen, user]);
+
+  // Auto-close modal whenever user is successfully authenticated and verified (or via Google)
   React.useEffect(() => {
     if (user && isOpen && !verificationPending) {
       if (user.emailVerified) {
@@ -78,29 +91,49 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     try {
       if (tab === 'signin') {
         await signInWithEmail(email, password);
-        setSubmitting(false);
-        onClose();
+        if (auth.currentUser && !auth.currentUser.emailVerified) {
+          setVerificationPending(true);
+          setResendCooldown(60);
+          setVerificationMsg('Please verify your email address to continue.');
+          setIsVerifiedSuccess(false);
+        } else {
+          onClose();
+        }
       } else {
         // First-time email registration: creates user and dispatches verification link
-        await signUpWithEmail(email, password, displayName, collegeName, rollNumber);
-        setVerificationPending(true);
-        setResendCooldown(60);
-        setVerificationMsg('');
-        setIsVerifiedSuccess(false);
-        setSubmitting(false);
+        const result = await signUpWithEmail(email, password, displayName, collegeName, rollNumber);
+        if (result && !result.isNewUser && result.emailVerified) {
+          // Account already existed and is verified -> close modal
+          onClose();
+        } else {
+          // New account or pending verification -> immediately switch to verification screen!
+          setVerificationPending(true);
+          setResendCooldown(60);
+          setVerificationMsg('');
+          setIsVerifiedSuccess(false);
+        }
       }
     } catch (e: any) {
       console.error('Auth error:', e);
       let msg = e.message || 'Authentication error';
       if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password') {
-        msg = 'Invalid email or password. If you are new, switch to "Create Account"!';
+        msg = tab === 'signup'
+          ? 'An account with this email already exists. Switch to Sign In or enter the correct password.'
+          : 'Invalid email or password. If you are new, switch to "Create Account"!';
       } else if (e.code === 'auth/email-already-in-use') {
-        msg = 'This email already has an account. Please switch to the Sign In tab!';
+        msg = 'An account with this email already exists. Please switch to the Sign In tab!';
         setTab('signin');
       } else if (e.code === 'auth/weak-password') {
         msg = 'Password must be at least 6 characters.';
+      } else if (e.code === 'auth/invalid-email') {
+        msg = 'Please enter a valid email address.';
+      } else if (e.code === 'auth/network-request-failed') {
+        msg = 'Network error. Please check your internet connection and try again.';
+      } else if (e.code === 'auth/too-many-requests') {
+        msg = 'Too many requests. Please wait a moment and try again.';
       }
       setErrorMsg(msg);
+    } finally {
       setSubmitting(false);
     }
   };
@@ -409,9 +442,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full bg-gradient-to-r from-neon-purple via-[#9333ea] to-electric-cyan text-white py-3.5 rounded-2xl font-label-caps text-xs uppercase tracking-wider font-bold hover:opacity-95 transition-all shadow-[0_0_25px_rgba(168,85,247,0.5)] border border-white/20 cursor-pointer"
+                    className="w-full bg-gradient-to-r from-neon-purple via-[#9333ea] to-electric-cyan text-white py-3.5 rounded-2xl font-label-caps text-xs uppercase tracking-wider font-bold hover:opacity-95 transition-all shadow-[0_0_25px_rgba(168,85,247,0.5)] border border-white/20 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
-                    {submitting ? 'Authenticating...' : tab === 'signin' ? 'Sign In with Email' : 'Create Account & Send Verification Link'}
+                    {submitting ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                        <span>Authenticating...</span>
+                      </>
+                    ) : tab === 'signin' ? (
+                      'Sign In with Email'
+                    ) : (
+                      'Create Account & Send Verification Link'
+                    )}
                   </button>
                 </div>
               </form>
