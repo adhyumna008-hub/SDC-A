@@ -31,6 +31,16 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
+export const isDummyRoll = (val?: string): boolean => {
+  if (!val) return true;
+  const clean = val.trim().toLowerCase();
+  if (clean === '' || clean === 'undefined' || clean === 'null') return true;
+  if (/^(reg|adm|demo|usr|test|student)([-_]|$)/i.test(clean)) return true;
+  if (/2026-000/i.test(clean)) return true;
+  if (/^demo/i.test(clean)) return true;
+  return false;
+};
+
 // Preset demo profiles for optional testing
 export const DEMO_PROFILES: Record<UserRole, UserProfile> = {
   admin: {
@@ -40,7 +50,7 @@ export const DEMO_PROFILES: Record<UserRole, UserProfile> = {
     photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80',
     role: 'admin',
     collegeName: 'Vardhaman College of Engineering',
-    rollNumber: 'ADM-2026-001',
+    rollNumber: '',
     qrToken: 'SDC_TICKET:usr-admin-01',
     emailVerified: true
   },
@@ -51,7 +61,7 @@ export const DEMO_PROFILES: Record<UserRole, UserProfile> = {
     photoURL: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=200&q=80',
     role: 'member',
     collegeName: 'Vardhaman College of Engineering',
-    rollNumber: '21881A0501',
+    rollNumber: '',
     qrToken: 'SDC_TICKET:usr-member-1',
     emailVerified: true
   },
@@ -62,7 +72,7 @@ export const DEMO_PROFILES: Record<UserRole, UserProfile> = {
     photoURL: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80',
     role: 'guest',
     collegeName: 'IIT Hyderabad',
-    rollNumber: 'IITH-2024-889',
+    rollNumber: '',
     qrToken: 'SDC_TICKET:usr-guest-1',
     emailVerified: true
   }
@@ -79,6 +89,7 @@ export const determineRoleFromEmail = (email: string): UserRole => {
 const mapFirebaseUser = (fbUser: FirebaseUser, extra?: { collegeName?: string; rollNumber?: string }): UserProfile => {
   const email = fbUser.email || '';
   const role = determineRoleFromEmail(email);
+  const cleanRoll = extra?.rollNumber && !isDummyRoll(extra.rollNumber) ? extra.rollNumber.trim().toUpperCase() : '';
   return {
     uid: fbUser.uid,
     email,
@@ -86,7 +97,7 @@ const mapFirebaseUser = (fbUser: FirebaseUser, extra?: { collegeName?: string; r
     photoURL: fbUser.photoURL || undefined,
     role,
     collegeName: extra?.collegeName || (role === 'member' || role === 'admin' ? 'Vardhaman College of Engineering' : 'External College'),
-    rollNumber: extra?.rollNumber || '',
+    rollNumber: cleanRoll,
     qrToken: `SDC_TICKET:${fbUser.uid}`,
     emailVerified: fbUser.emailVerified
   };
@@ -191,7 +202,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         displayName: cleanEmail.split('@')[0],
         role,
         collegeName: role === 'member' || role === 'admin' ? 'Vardhaman College of Engineering' : 'External College',
-        rollNumber: '24881A05B4',
+        rollNumber: '',
         qrToken: `SDC_TICKET:demo`
       });
       setIsDemoMode(true);
@@ -201,6 +212,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUpWithEmail = async (email: string, pass: string, name: string, college?: string, roll?: string) => {
     const cleanEmail = email.trim();
     const cleanName = (name || cleanEmail.split('@')[0]).trim();
+    const cleanRoll = roll && !isDummyRoll(roll) ? roll.trim().toUpperCase() : '';
     if (isFirebaseConfigured) {
       try {
         const res = await createUserWithEmailAndPassword(auth, cleanEmail, pass);
@@ -222,7 +234,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.warn('Could not dispatch verification email:', verifErr);
           }
 
-          setUser(mapFirebaseUser(res.user, { collegeName: college, rollNumber: roll }));
+          setUser(mapFirebaseUser(res.user, { collegeName: college, rollNumber: cleanRoll }));
         }
       } catch (err: any) {
         // If email already exists, gracefully sign in with the provided password!
@@ -230,7 +242,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.log('Account already exists. Attempting direct sign-in...');
           const signRes = await signInWithEmailAndPassword(auth, cleanEmail, pass);
           if (signRes.user) {
-            setUser(mapFirebaseUser(signRes.user, { collegeName: college, rollNumber: roll }));
+            setUser(mapFirebaseUser(signRes.user, { collegeName: college, rollNumber: cleanRoll }));
             return;
           }
         }
@@ -244,7 +256,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         displayName: cleanName,
         role,
         collegeName: college || (role === 'member' || role === 'admin' ? 'Vardhaman College of Engineering' : 'External College'),
-        rollNumber: roll || '',
+        rollNumber: cleanRoll,
         qrToken: `SDC_TICKET:demo`,
         emailVerified: true
       });

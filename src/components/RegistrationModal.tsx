@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { EventItem, EventRegistration } from '../types';
-import { useAuth } from '../context/AuthContext';
+import { useAuth, isDummyRoll } from '../context/AuthContext';
 import { registerForEventService } from '../services/dataService';
 import { AuthModal } from './AuthModal';
 
@@ -25,10 +25,16 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
   const isInitialVardhaman = !user?.collegeName || user.collegeName.toLowerCase().includes('vardhaman');
   const [collegeType, setCollegeType] = useState<'vardhaman' | 'other'>(isInitialVardhaman ? 'vardhaman' : 'other');
   const [otherCollegeName, setOtherCollegeName] = useState(isInitialVardhaman ? '' : user?.collegeName || '');
-  const initialRoll = (user?.rollNumber && !user.rollNumber.startsWith('REG-') && !user.rollNumber.startsWith('ADM-'))
-    ? user.rollNumber
-    : '';
-  const [rollNumber, setRollNumber] = useState(initialRoll);
+  const [rollNumber, setRollNumber] = useState<string>(() => (isDummyRoll(user?.rollNumber) ? '' : user!.rollNumber!.trim()));
+
+  // Ensure any dummy roll cached in user state is strictly wiped out
+  React.useEffect(() => {
+    if (user?.rollNumber && !isDummyRoll(user.rollNumber)) {
+      setRollNumber(user.rollNumber.trim());
+    } else if (isDummyRoll(rollNumber)) {
+      setRollNumber('');
+    }
+  }, [user?.rollNumber]);
 
   // Pricing & Pass Type
   const isPaidEvent = event.feeType === 'paid' || (event.ticketPrice !== undefined && event.ticketPrice > 0);
@@ -127,7 +133,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
       return;
     }
 
-    if (!rollNumber.trim()) {
+    const cleanRoll = isDummyRoll(rollNumber) ? '' : rollNumber.trim().toUpperCase();
+    if (!cleanRoll) {
       setErrorMsg('Please enter your college roll number or student ID.');
       return;
     }
@@ -174,7 +181,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
         userName: fullName.trim(),
         phoneNumber: phoneNumber.trim(),
         collegeName: finalCollegeName,
-        rollNumber: rollNumber.trim(),
+        rollNumber: cleanRoll,
         registrationType: regType,
         teamCode: finalTeamCode,
         teamName: finalTeamName,
@@ -520,7 +527,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
                           type="text"
                           required
                           placeholder="e.g. 24881A05B4"
-                          value={rollNumber}
+                          value={isDummyRoll(rollNumber) ? '' : rollNumber}
                           onChange={(e) => setRollNumber(e.target.value.toUpperCase())}
                           className="w-full bg-white/[0.04] border border-white/10 rounded-xl p-2.5 text-white focus:outline-none focus:border-neon-purple font-mono uppercase"
                         />
