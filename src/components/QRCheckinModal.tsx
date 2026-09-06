@@ -232,7 +232,7 @@ export const QRCheckinModal: React.FC<QRCheckinModalProps> = ({ onClose, onCheck
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="e.g. reg-178798... or SDC-4892 or 21881A0501"
+                placeholder="e.g. 24881A05B4 or SDC-4892"
                 value={qrInput}
                 onChange={(e) => setQrInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleVerify(qrInput)}

@@ -86,7 +86,7 @@ const mapFirebaseUser = (fbUser: FirebaseUser, extra?: { collegeName?: string; r
     photoURL: fbUser.photoURL || undefined,
     role,
     collegeName: extra?.collegeName || (role === 'member' || role === 'admin' ? 'Vardhaman College of Engineering' : 'External College'),
-    rollNumber: extra?.rollNumber || 'REG-2026-000',
+    rollNumber: extra?.rollNumber || '',
     qrToken: `SDC_TICKET:${fbUser.uid}`,
     emailVerified: fbUser.emailVerified
   };
@@ -191,7 +191,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         displayName: cleanEmail.split('@')[0],
         role,
         collegeName: role === 'member' || role === 'admin' ? 'Vardhaman College of Engineering' : 'External College',
-        rollNumber: 'REG-2026-DEMO',
+        rollNumber: '24881A05B4',
         qrToken: `SDC_TICKET:demo`
       });
       setIsDemoMode(true);
@@ -244,7 +244,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         displayName: cleanName,
         role,
         collegeName: college || (role === 'member' || role === 'admin' ? 'Vardhaman College of Engineering' : 'External College'),
-        rollNumber: roll || 'REG-2026-DEMO',
+        rollNumber: roll || '',
         qrToken: `SDC_TICKET:demo`,
         emailVerified: true
       });

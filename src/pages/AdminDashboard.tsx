@@ -1116,7 +1116,7 @@ export const AdminDashboard: React.FC = () => {
                 <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/40 text-lg">search</span>
                 <input
                   type="text"
-                  placeholder="Search by 12-digit UTR Number, Student Name, Roll Number, or Email..."
+                  placeholder="Search by 12-digit UTR, Student Name, Roll ID (e.g. 24881A05B4), or Email..."
                   value={paymentSearchQuery}
                   onChange={(e) => setPaymentSearchQuery(e.target.value)}
                   className="w-full bg-[#0a1020] border border-white/15 rounded-2xl pl-11 pr-4 py-3 text-white text-xs placeholder-white/40 focus:outline-none focus:border-amber-500/60 focus:bg-white/[0.07] transition-all shadow-soft-ui"

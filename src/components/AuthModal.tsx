@@ -396,10 +396,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                       <label className="block text-on-surface-variant font-code-sm mb-1 text-[11px]">Roll / Student ID</label>
                       <input
                         type="text"
-                        placeholder="21881A0501"
+                        placeholder="e.g. 24881A05B4"
                         value={rollNumber}
-                        onChange={(e) => setRollNumber(e.target.value)}
-                        className="w-full bg-white/[0.04] border border-white/10 rounded-xl p-3 text-white font-mono focus:outline-none focus:border-neon-purple transition-all backdrop-blur-md"
+                        onChange={(e) => setRollNumber(e.target.value.toUpperCase())}
+                        className="w-full bg-white/[0.04] border border-white/10 rounded-xl p-3 text-white font-mono uppercase focus:outline-none focus:border-neon-purple transition-all backdrop-blur-md"
                       />
                     </div>
                   </div>

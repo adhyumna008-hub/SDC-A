@@ -25,7 +25,10 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
   const isInitialVardhaman = !user?.collegeName || user.collegeName.toLowerCase().includes('vardhaman');
   const [collegeType, setCollegeType] = useState<'vardhaman' | 'other'>(isInitialVardhaman ? 'vardhaman' : 'other');
   const [otherCollegeName, setOtherCollegeName] = useState(isInitialVardhaman ? '' : user?.collegeName || '');
-  const [rollNumber, setRollNumber] = useState(user?.rollNumber || '');
+  const initialRoll = (user?.rollNumber && !user.rollNumber.startsWith('REG-') && !user.rollNumber.startsWith('ADM-'))
+    ? user.rollNumber
+    : '';
+  const [rollNumber, setRollNumber] = useState(initialRoll);
 
   // Pricing & Pass Type
   const isPaidEvent = event.feeType === 'paid' || (event.ticketPrice !== undefined && event.ticketPrice > 0);
@@ -516,9 +519,9 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({ event, onC
                         <input
                           type="text"
                           required
-                          placeholder="e.g. 21881A0501"
+                          placeholder="e.g. 24881A05B4"
                           value={rollNumber}
-                          onChange={(e) => setRollNumber(e.target.value)}
+                          onChange={(e) => setRollNumber(e.target.value.toUpperCase())}
                           className="w-full bg-white/[0.04] border border-white/10 rounded-xl p-2.5 text-white focus:outline-none focus:border-neon-purple font-mono uppercase"
                         />
                       </div>
