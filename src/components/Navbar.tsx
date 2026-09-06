@@ -141,7 +141,7 @@ export const Navbar: React.FC = () => {
             <div className="flex items-center gap-2.5">
               <div className="relative">
                 <img
-                  src={user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'}
+                  src={user.photoURL || '/default-avatar.svg'}
                   alt={user.displayName}
                   className="w-7 h-7 rounded-full border border-neon-purple/50 object-cover shadow-soft-ui"
                 />
@@ -283,7 +283,7 @@ export const Navbar: React.FC = () => {
               <div className="space-y-2">
                 <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/10">
                   <img
-                    src={user.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'}
+                    src={user.photoURL || '/default-avatar.svg'}
                     alt={user.displayName}
                     className="w-9 h-9 rounded-full border border-neon-purple object-cover"
                   />

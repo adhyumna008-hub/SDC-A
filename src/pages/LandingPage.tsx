@@ -144,11 +144,11 @@ export const LandingPage: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <div className="relative w-12 h-12 rounded-2xl overflow-hidden bg-ember-amber/15 border border-amber-500/40 shrink-0 shadow-[0_0_12px_rgba(249,115,22,0.3)] flex items-center justify-center">
                     <img 
-                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80" 
+                      src="/default-avatar.svg" 
                       alt="President, SDC" 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                    <div className="absolute inset-0 bg-amber-500/10 mix-blend-color pointer-events-none"></div>
                   </div>
                   <div className="overflow-hidden">
                     <div className="flex items-center gap-1.5 mb-0.5">
@@ -167,11 +167,11 @@ export const LandingPage: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <div className="relative w-12 h-12 rounded-2xl overflow-hidden bg-neon-purple/15 border border-neon-purple/40 shrink-0 shadow-[0_0_12px_rgba(168,85,247,0.3)] flex items-center justify-center">
                     <img 
-                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80" 
+                      src="/default-avatar.svg" 
                       alt="Vice President, SDC" 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                    <div className="absolute inset-0 bg-neon-purple/10 mix-blend-color pointer-events-none"></div>
                   </div>
                   <div className="overflow-hidden">
                     <div className="flex items-center gap-1.5 mb-0.5">
@@ -211,11 +211,11 @@ export const LandingPage: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <div className="relative w-12 h-12 rounded-2xl overflow-hidden bg-electric-cyan/15 border border-electric-cyan/40 shrink-0 shadow-[0_0_12px_rgba(14,165,233,0.3)] flex items-center justify-center">
                     <img 
-                      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&q=80" 
+                      src="/default-avatar.svg" 
                       alt="Secretary, SDC" 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                    <div className="absolute inset-0 bg-electric-cyan/10 mix-blend-color pointer-events-none"></div>
                   </div>
                   <div className="overflow-hidden">
                     <div className="flex items-center gap-1.5 mb-0.5">
@@ -234,11 +234,11 @@ export const LandingPage: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <div className="relative w-12 h-12 rounded-2xl overflow-hidden bg-emerald-500/15 border border-emerald-500/40 shrink-0 shadow-[0_0_12px_rgba(34,197,94,0.3)] flex items-center justify-center">
                     <img 
-                      src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80" 
+                      src="/default-avatar.svg" 
                       alt="Joint Secretary, SDC" 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                    <div className="absolute inset-0 bg-emerald-500/10 mix-blend-color pointer-events-none"></div>
                   </div>
                   <div className="overflow-hidden">
                     <div className="flex items-center gap-1.5 mb-0.5">
