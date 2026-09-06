@@ -55,7 +55,9 @@ export interface EventItem {
 }
 
 export interface ClubSettings {
-  showHackathonMatrix: boolean;
+  announcementActive?: boolean;
+  announcementText?: string;
+  showHackathonMatrix?: boolean;
 }
 
 export interface EventRegistration {

@@ -738,7 +738,9 @@ export const getSystemAnnouncements = (): SystemAnnouncement[] => {
 // ----------------------------------------------------
 const LOCAL_STORAGE_SETTINGS = 'sdc_club_settings_v1';
 const DEFAULT_SETTINGS: ClubSettings = {
-  showHackathonMatrix: false // Hidden by default as requested by user
+  announcementActive: true,
+  announcementText: '',
+  showHackathonMatrix: false
 };
 
 export const getClubSettingsService = async (): Promise<ClubSettings> => {

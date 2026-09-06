@@ -12,6 +12,8 @@ service cloud.firestore {
         request.auth.token.email in [
           'adhyumna008@gmail.com',
           'studentdevelopersclub88@gmail.com',
+          'nalub9267@gmail.com',
+          'rehanstudy4@gmail.com',
           'manimoukthika3699@gmail.com',
           'admin@vardhaman.org',
           'sdc.admin@vardhaman.org',
@@ -49,6 +51,11 @@ service cloud.firestore {
 
     // Opportunities Collection
     match /opportunities/{oppId} {
+      allow read, write: if true;
+    }
+
+    // Club Settings Collection (Live Announcements & Site Toggles)
+    match /club_settings/{document} {
       allow read, write: if true;
     }
   }

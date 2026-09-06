@@ -64,8 +64,14 @@ export const AdminDashboard: React.FC = () => {
   const [evtExternalUrl, setEvtExternalUrl] = useState('');
   const [evtOrganizerName, setEvtOrganizerName] = useState('');
 
-  // Landing Page Feature Flags State
-  const [clubSettings, setClubSettings] = useState<ClubSettings>({ showHackathonMatrix: false });
+  // Club Settings & Dynamic Announcement Ticker State
+  const [clubSettings, setClubSettings] = useState<ClubSettings>({
+    announcementActive: true,
+    announcementText: ''
+  });
+  const [customAnnouncementInput, setCustomAnnouncementInput] = useState('');
+  const [isSavingAnnouncement, setIsSavingAnnouncement] = useState(false);
+  const [announcementSaveSuccess, setAnnouncementSaveSuccess] = useState(false);
 
   // New Opportunity Form State
   const [oppTitle, setOppTitle] = useState('');
@@ -80,7 +86,12 @@ export const AdminDashboard: React.FC = () => {
     const unsubEvents = subscribeEventsService(setEvents);
     const unsubRegs = subscribeAllRegistrationsService(setRegistrations);
     const unsubIdeas = subscribeIdeaRequestsService(setIdeas);
-    const unsubSettings = subscribeClubSettingsService(setClubSettings);
+    const unsubSettings = subscribeClubSettingsService((settings) => {
+      setClubSettings(settings);
+      if (settings.announcementText !== undefined) {
+        setCustomAnnouncementInput(settings.announcementText);
+      }
+    });
     return () => {
       unsubEvents();
       unsubRegs();
@@ -89,10 +100,36 @@ export const AdminDashboard: React.FC = () => {
     };
   }, []);
 
-  const handleToggleHackathonMatrix = async () => {
-    const nextVal = !clubSettings.showHackathonMatrix;
-    setClubSettings(prev => ({ ...prev, showHackathonMatrix: nextVal }));
-    await updateClubSettingsService({ showHackathonMatrix: nextVal });
+  const handleToggleAnnouncementActive = async () => {
+    const nextVal = clubSettings.announcementActive === false ? true : false;
+    setClubSettings(prev => ({ ...prev, announcementActive: nextVal }));
+    await updateClubSettingsService({ announcementActive: nextVal });
+  };
+
+  const handleSaveAnnouncement = async () => {
+    setIsSavingAnnouncement(true);
+    try {
+      await updateClubSettingsService({
+        announcementText: customAnnouncementInput.trim(),
+        announcementActive: true
+      });
+      setAnnouncementSaveSuccess(true);
+      setTimeout(() => setAnnouncementSaveSuccess(false), 3000);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSavingAnnouncement(false);
+    }
+  };
+
+  const handleResetAnnouncement = async () => {
+    setCustomAnnouncementInput('');
+    await updateClubSettingsService({
+      announcementText: '',
+      announcementActive: true
+    });
+    setAnnouncementSaveSuccess(true);
+    setTimeout(() => setAnnouncementSaveSuccess(false), 3000);
   };
 
   const handleCreateEvent = async (e: React.FormEvent) => {
@@ -853,7 +890,7 @@ export const AdminDashboard: React.FC = () => {
                   <span className="material-symbols-outlined text-lg text-white/60">settings</span>
                   <div>
                     <div className="text-xs font-bold">System & Settings</div>
-                    <div className="text-[10px] text-white/40">Matrix toggles & status</div>
+                    <div className="text-[10px] text-white/40">Announcement ticker & system</div>
                   </div>
                 </div>
               </button>
@@ -1428,43 +1465,10 @@ export const AdminDashboard: React.FC = () => {
         )}
 
         {/* TAB 2: UPCOMING EVENTS & COMMUNITY PROPOSALS */}
-        {(adminNavTab === 'events' || adminNavTab === 'overview') && (
+        {adminNavTab === 'events' && (
           <>
-            {/* Landing Page Feature Visibility & Controls */}
-            <div className="soft-ui-panel rounded-3xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-soft-ui-lg">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-neon-purple text-lg">tune</span>
-                  <h3 className="text-white font-bold text-sm">Landing Page Feature: Flagship Hackathon Matrix</h3>
-                  <span className={`text-[10px] mono font-bold uppercase px-2.5 py-0.5 rounded-full ${
-                    clubSettings.showHackathonMatrix
-                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                      : 'bg-white/5 text-white/50 border border-white/10'
-                  }`}>
-                    {clubSettings.showHackathonMatrix ? 'Currently Visible' : 'Currently Hidden'}
-                  </span>
-                </div>
-                <p className="text-xs text-white/50 max-w-2xl leading-relaxed">
-                  Toggle the Hackathon Prize Matrix on the Landing Page.
-                </p>
-              </div>
-              <button
-                onClick={handleToggleHackathonMatrix}
-                className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
-                  clubSettings.showHackathonMatrix
-                    ? 'bg-emerald-500 hover:bg-emerald-400 text-black shadow-aurora'
-                    : 'soft-ui-btn text-white'
-                }`}
-              >
-                <span className="material-symbols-outlined text-sm">
-                  {clubSettings.showHackathonMatrix ? 'visibility' : 'visibility_off'}
-                </span>
-                <span>{clubSettings.showHackathonMatrix ? 'Hide from Landing Page' : 'Show on Landing Page'}</span>
-              </button>
-            </div>
-
             {/* Data Grid: Upcoming Event Control */}
-            <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fadeIn">
           {/* Upcoming Event Control Panel */}
           <div className="soft-ui-card rounded-3xl flex flex-col min-h-[300px] max-h-[520px] overflow-hidden">
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-white/[0.02]">
@@ -1669,6 +1673,139 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   ))
                 )}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* TAB 4: SYSTEM & ANNOUNCEMENT TICKER SETTINGS */}
+        {adminNavTab === 'overview' && (
+          <section className="animate-fadeIn max-w-4xl mx-auto space-y-6">
+            <div className="bg-[#0b1326] border border-white/20 rounded-3xl p-6 relative shadow-soft-ui-lg space-y-6">
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-white/10 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-neon-purple/20 border border-neon-purple/50 flex items-center justify-center text-neon-purple shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                    <span className="material-symbols-outlined text-xl">campaign</span>
+                  </div>
+                  <div>
+                    <h2 className="font-headline-lg text-lg text-white font-bold">
+                      Campus Announcement Ticker & Radar
+                    </h2>
+                    <p className="text-xs text-white/50">
+                      Real-time marquee broadcast across the top of all public pages
+                    </p>
+                  </div>
+                </div>
+
+                {/* Live Ticker Toggle */}
+                <button
+                  type="button"
+                  onClick={handleToggleAnnouncementActive}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                    clubSettings.announcementActive !== false
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_12px_rgba(34,197,94,0.3)]'
+                      : 'bg-white/5 text-white/50 border border-white/10'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-base">
+                    {clubSettings.announcementActive !== false ? 'toggle_on' : 'toggle_off'}
+                  </span>
+                  <span>{clubSettings.announcementActive !== false ? 'Ticker Active (Visible)' : 'Ticker Paused (Hidden)'}</span>
+                </button>
+              </div>
+
+              {/* Broadcast Message Input Form */}
+              <div className="space-y-3">
+                <label className="block text-xs font-mono text-white/80 uppercase tracking-wider">
+                  Custom Broadcast Message
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={customAnnouncementInput}
+                    onChange={(e) => setCustomAnnouncementInput(e.target.value)}
+                    placeholder="e.g. ⚡ Registrations are now LIVE for 'AI in Civil Engineering'! Entry pass fee: ₹99."
+                    className="w-full bg-[#060e20] border border-white/15 rounded-2xl px-4 py-3.5 text-xs text-white placeholder-white/40 focus:outline-none focus:border-neon-purple font-mono shadow-soft-ui transition-all"
+                  />
+                </div>
+                <p className="text-[11px] text-white/50">
+                  Leave blank to automatically broadcast the nearest upcoming event from Firestore plus the Idea Hub prompt.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-white/10">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSaveAnnouncement}
+                    disabled={isSavingAnnouncement}
+                    className="px-5 py-2.5 rounded-xl bg-neon-purple hover:bg-neon-purple/80 text-white font-bold text-xs flex items-center gap-2 shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-sm">send</span>
+                    <span>{isSavingAnnouncement ? 'Saving...' : 'Save & Publish Broadcast'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleResetAnnouncement}
+                    className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-bold border border-white/10 transition-all cursor-pointer"
+                  >
+                    Reset to Auto / Live Event Radar
+                  </button>
+                </div>
+
+                {announcementSaveSuccess && (
+                  <span className="text-emerald-400 text-xs font-mono font-bold flex items-center gap-1.5 animate-fadeIn">
+                    <span className="material-symbols-outlined text-sm">check_circle</span>
+                    <span>Broadcast saved to Firestore!</span>
+                  </span>
+                )}
+              </div>
+
+              {/* Live Preview of Broadcast Banner */}
+              <div className="pt-3 border-t border-white/10 space-y-2">
+                <span className="text-[10px] font-mono uppercase tracking-widest text-white/40">
+                  Live Broadcast Preview (What students see):
+                </span>
+                <div className="bg-[#060e20] border border-white/15 rounded-2xl p-3 flex items-center gap-3 overflow-hidden">
+                  <span className="flex items-center gap-1 bg-neon-purple/20 text-neon-purple px-2 py-0.5 rounded-full text-[10px] uppercase font-bold tracking-wider shrink-0 border border-neon-purple/40">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    LIVE RADAR
+                  </span>
+                  <div className="text-xs font-mono text-white/90 truncate">
+                    {customAnnouncementInput.trim() || (events.length > 0 ? `🚀 Registrations are now LIVE for "${events[0].title}"!` : '💡 Upvote and propose community workshops in the Idea Hub!')}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* System Information Card */}
+            <div className="bg-[#0b1326] border border-white/20 rounded-3xl p-6 relative shadow-soft-ui-lg">
+              <h3 className="font-headline-lg text-base text-white font-bold flex items-center gap-2 mb-4">
+                <span className="material-symbols-outlined text-electric-cyan">dns</span>
+                <span>System Health & Diagnostics</span>
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
+                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-3.5 space-y-1">
+                  <span className="text-white/40 text-[10px] uppercase">Firestore Sync</span>
+                  <div className="text-emerald-400 font-bold flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span>Real-time Active</span>
+                  </div>
+                </div>
+
+                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-3.5 space-y-1">
+                  <span className="text-white/40 text-[10px] uppercase">Active Events</span>
+                  <div className="text-white font-bold">{events.length} Workshops Listed</div>
+                </div>
+
+                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-3.5 space-y-1">
+                  <span className="text-white/40 text-[10px] uppercase">Total Registrations</span>
+                  <div className="text-neon-purple font-bold">{registrations.length} Passes Registered</div>
+                </div>
               </div>
             </div>
           </section>

@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { getEventsService, subscribeOpportunitiesService, subscribeEventsService, subscribeClubSettingsService } from '../services/dataService';
-import { EventItem, Opportunity, ClubSettings } from '../types';
+import { getEventsService, subscribeOpportunitiesService, subscribeEventsService } from '../services/dataService';
+import { EventItem, Opportunity } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { AuthModal } from '../components/AuthModal';
 import { SocialChannels } from '../components/SocialChannels';
-import { HackathonPrizeMatrix } from '../components/HackathonPrizeMatrix';
 import { DiscordCommunityBanner } from '../components/DiscordCommunityBanner';
 
 export const LandingPage: React.FC = () => {
@@ -15,7 +14,6 @@ export const LandingPage: React.FC = () => {
 
   const [upcomingEvents, setUpcomingEvents] = useState<EventItem[]>([]);
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
-  const [clubSettings, setClubSettings] = useState<ClubSettings>({ showHackathonMatrix: false });
 
   useEffect(() => {
     getEventsService().then(setUpcomingEvents);
@@ -27,14 +25,9 @@ export const LandingPage: React.FC = () => {
       setUpcomingEvents(events);
     });
 
-    const unsubscribeSettings = subscribeClubSettingsService((settings) => {
-      setClubSettings(settings);
-    });
-
     return () => {
       unsubscribeOpps();
       unsubscribeEvents();
-      unsubscribeSettings();
     };
   }, []);
 
@@ -400,9 +393,6 @@ export const LandingPage: React.FC = () => {
           </div>
         </section>
       )}
-
-      {/* Flagship Hackathon Tracks & Prize Pool Matrix (Completely hidden unless an active grand hackathon is running) */}
-      {clubSettings.showHackathonMatrix && false && <HackathonPrizeMatrix />}
 
       {/* Discord Community CTA Banner */}
       <DiscordCommunityBanner />
