@@ -64,6 +64,14 @@ export const AdminDashboard: React.FC = () => {
   const [evtExternalUrl, setEvtExternalUrl] = useState('');
   const [evtOrganizerName, setEvtOrganizerName] = useState('');
 
+  // Event Registration Settings Modal State
+  const [editingSettingsEvent, setEditingSettingsEvent] = useState<EventItem | null>(null);
+  const [editMaxSeats, setEditMaxSeats] = useState<number>(100);
+  const [editStartTime, setEditStartTime] = useState<string>('');
+  const [editEndTime, setEditEndTime] = useState<string>('');
+  const [isSavingEventSettings, setIsSavingEventSettings] = useState<boolean>(false);
+  const [eventSettingsSaveSuccess, setEventSettingsSaveSuccess] = useState<boolean>(false);
+
   // Club Settings & Dynamic Announcement Ticker State
   const [clubSettings, setClubSettings] = useState<ClubSettings>({
     announcementActive: true,
@@ -130,6 +138,52 @@ export const AdminDashboard: React.FC = () => {
     });
     setAnnouncementSaveSuccess(true);
     setTimeout(() => setAnnouncementSaveSuccess(false), 3000);
+  };
+
+  const handleOpenEventSettings = (evt: EventItem) => {
+    setEditingSettingsEvent(evt);
+    setEditMaxSeats(evt.max_seats || 100);
+    const toLocalDatetime = (isoStr?: string) => {
+      if (!isoStr) return '';
+      try {
+        const d = new Date(isoStr);
+        if (isNaN(d.getTime())) return '';
+        const pad = (n: number) => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      } catch {
+        return '';
+      }
+    };
+    setEditStartTime(toLocalDatetime(evt.registration_start_time));
+    setEditEndTime(toLocalDatetime(evt.registration_end_time));
+    setEventSettingsSaveSuccess(false);
+  };
+
+  const handleSaveEventSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSettingsEvent) return;
+    setIsSavingEventSettings(true);
+    try {
+      const updates: Partial<EventItem> = {
+        max_seats: Math.max(1, Number(editMaxSeats) || 1),
+        registration_start_time: editStartTime ? new Date(editStartTime).toISOString() : new Date().toISOString(),
+        registration_end_time: editEndTime ? new Date(editEndTime).toISOString() : ''
+      };
+
+      await updateEventService(editingSettingsEvent.id, updates);
+
+      setEvents(prev => prev.map(ev => ev.id === editingSettingsEvent.id ? { ...ev, ...updates } : ev));
+
+      setEventSettingsSaveSuccess(true);
+      setTimeout(() => {
+        setEventSettingsSaveSuccess(false);
+        setEditingSettingsEvent(null);
+      }, 1200);
+    } catch (err) {
+      console.error('Failed to update event settings:', err);
+    } finally {
+      setIsSavingEventSettings(false);
+    }
   };
 
   const handleCreateEvent = async (e: React.FormEvent) => {
@@ -1507,10 +1561,19 @@ export const AdminDashboard: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex gap-1.5 flex-wrap justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEventSettings(evt)}
+                            className="px-2.5 py-1 rounded-xl bg-neon-purple/20 text-xs font-code-sm text-neon-purple border border-neon-purple/40 hover:bg-neon-purple hover:text-white transition-all flex items-center gap-1 font-bold cursor-pointer"
+                            title="Edit Registration Window & Capacity Settings"
+                          >
+                            <span className="material-symbols-outlined text-xs">tune</span>
+                            <span>Settings</span>
+                          </button>
                           <button
                             onClick={() => setViewingRegistrationsEvent(evt)}
-                            className="px-2.5 py-1 rounded-xl bg-neon-purple/20 text-xs font-code-sm text-neon-purple border border-neon-purple/40 hover:bg-neon-purple hover:text-white transition-colors flex items-center gap-1 font-bold cursor-pointer"
+                            className="px-2.5 py-1 rounded-xl bg-electric-cyan/15 text-xs font-code-sm text-electric-cyan border border-electric-cyan/30 hover:bg-electric-cyan hover:text-white transition-colors flex items-center gap-1 font-bold cursor-pointer"
                             title="View Registered Attendees List"
                           >
                             <span className="material-symbols-outlined text-xs">group</span>
@@ -1522,7 +1585,7 @@ export const AdminDashboard: React.FC = () => {
                             title="Export Structured Multi-Tab Excel Workbook (.xlsx)"
                           >
                             <span className="material-symbols-outlined text-xs">table_view</span>
-                            <span>Export Excel</span>
+                            <span>Export</span>
                           </button>
                           <button
                             onClick={() => deleteEventService(evt.id).then(() => setEvents(events.filter(e => e.id !== evt.id)))}
@@ -1534,15 +1597,21 @@ export const AdminDashboard: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3 pt-2 border-t border-outline-variant/10 text-xs font-code-sm">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-outline-variant/10 text-[11px] font-code-sm text-white/60">
                         <div>
-                          <span className="text-on-surface-variant">Team Max Size: </span>
+                          <span className="text-on-surface-variant">Team Max: </span>
                           <span className="text-white font-bold">{evt.max_team_size}</span>
                         </div>
                         <div>
                           <span className="text-on-surface-variant">Inter-College: </span>
                           <span className={evt.is_inter_college ? 'text-success-glow font-bold' : 'text-error font-bold'}>
                             {evt.is_inter_college ? 'YES' : 'NO'}
+                          </span>
+                        </div>
+                        <div className="truncate">
+                          <span className="text-on-surface-variant">Reg Deadline: </span>
+                          <span className="text-electric-cyan font-mono font-bold">
+                            {evt.registration_end_time ? new Date(evt.registration_end_time).toLocaleDateString() : 'Open'}
                           </span>
                         </div>
                       </div>
@@ -2025,6 +2094,163 @@ export const AdminDashboard: React.FC = () => {
                 >
                   Publish Event
                 </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Event Registration Window & Capacity Settings Modal */}
+      {editingSettingsEvent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-deep-black/85 backdrop-blur-xl animate-fadeIn">
+          <div className="bg-[#0b1326] border border-white/20 rounded-3xl max-w-lg w-full p-6 relative shadow-2xl space-y-5 animate-scaleIn">
+            {/* Modal Header */}
+            <div className="flex justify-between items-start border-b border-white/10 pb-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="w-8 h-8 rounded-xl bg-neon-purple/20 border border-neon-purple/40 text-neon-purple flex items-center justify-center">
+                    <span className="material-symbols-outlined text-lg">tune</span>
+                  </span>
+                  <h3 className="font-headline-lg text-lg font-bold text-white">
+                    Event Registration Settings
+                  </h3>
+                </div>
+                <p className="text-xs text-white/60 line-clamp-1">
+                  Editing: <strong className="text-white">{editingSettingsEvent.title}</strong>
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingSettingsEvent(null)}
+                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-white/70 hover:text-white flex items-center justify-center border border-white/10 cursor-pointer transition-colors"
+              >
+                <span className="material-symbols-outlined text-sm">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEventSettings} className="space-y-4 text-xs font-body-md">
+              {/* Max Registrations / Seats Input */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm text-electric-cyan">group</span>
+                    <span>Max Registrations (Capacity Limit)</span>
+                  </label>
+                  <span className="text-[11px] font-mono text-white/50">
+                    Current Registered: <strong className="text-electric-cyan">{editingSettingsEvent.registered_count || 0}</strong>
+                  </span>
+                </div>
+                <input
+                  type="number"
+                  min={1}
+                  required
+                  value={editMaxSeats}
+                  onChange={(e) => setEditMaxSeats(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-full bg-[#060e20] border border-white/15 rounded-xl p-3 text-white text-sm font-mono font-bold focus:outline-none focus:border-neon-purple transition-all"
+                />
+                <p className="text-[11px] text-white/40">
+                  When registrations reach this number, further students will be waitlisted. Updating this immediately syncs live to the Events tab.
+                </p>
+              </div>
+
+              {/* Registration Time Period Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/10">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm text-emerald-400">play_circle</span>
+                    <span>Registration Start Time</span>
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={editStartTime}
+                    onChange={(e) => setEditStartTime(e.target.value)}
+                    className="w-full bg-[#060e20] border border-white/15 rounded-xl p-2.5 text-white text-xs font-mono focus:outline-none focus:border-neon-purple transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const now = new Date();
+                      const pad = (n: number) => String(n).padStart(2, '0');
+                      setEditStartTime(`${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`);
+                    }}
+                    className="text-[10px] text-neon-purple hover:underline font-mono cursor-pointer"
+                  >
+                    ⚡ Set to Right Now
+                  </button>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm text-amber-400">stop_circle</span>
+                    <span>Registration End Time</span>
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={editEndTime}
+                    onChange={(e) => setEditEndTime(e.target.value)}
+                    className="w-full bg-[#060e20] border border-white/15 rounded-xl p-2.5 text-white text-xs font-mono focus:outline-none focus:border-neon-purple transition-all"
+                  />
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = editEndTime ? new Date(editEndTime) : new Date();
+                        target.setDate(target.getDate() + 3);
+                        const pad = (n: number) => String(n).padStart(2, '0');
+                        setEditEndTime(`${target.getFullYear()}-${pad(target.getMonth() + 1)}-${pad(target.getDate())}T${pad(target.getHours())}:${pad(target.getMinutes())}`);
+                      }}
+                      className="text-[10px] text-amber-300 hover:underline font-mono cursor-pointer"
+                    >
+                      +3 Days
+                    </button>
+                    <span className="text-white/20">•</span>
+                    <button
+                      type="button"
+                      onClick={() => setEditEndTime('')}
+                      className="text-[10px] text-white/50 hover:text-white font-mono cursor-pointer"
+                    >
+                      Clear (No Deadline)
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Status Feedback / Live Sync Banner */}
+              <div className="p-3 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center gap-2.5 text-xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0"></span>
+                <span className="text-white/70">
+                  Updates sync instantly to public visitors browsing the Events tab.
+                </span>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex items-center justify-between pt-3 border-t border-white/10">
+                {eventSettingsSaveSuccess ? (
+                  <span className="text-emerald-400 font-bold text-xs flex items-center gap-1 animate-fadeIn">
+                    <span className="material-symbols-outlined text-sm">check_circle</span>
+                    <span>Settings Updated & Synced Live!</span>
+                  </span>
+                ) : (
+                  <div></div>
+                )}
+
+                <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setEditingSettingsEvent(null)}
+                    className="px-4 py-2 rounded-xl text-xs text-white/60 hover:text-white border border-white/10 transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSavingEventSettings}
+                    className="px-5 py-2 rounded-xl bg-neon-purple hover:bg-neon-purple/80 text-white font-bold text-xs shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-sm">save</span>
+                    <span>{isSavingEventSettings ? 'Saving...' : 'Save & Sync Live'}</span>
+                  </button>
+                </div>
               </div>
             </form>
           </div>
